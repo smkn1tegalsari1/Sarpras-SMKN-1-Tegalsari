@@ -1,0 +1,238 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "User accounts and roles for SISARPRAS SMKN 1 Tegalsari",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string" },
+        "username": { "type": "string" },
+        "password": { "type": "string" },
+        "nama": { "type": "string" },
+        "email": { "type": "string" },
+        "role": { "type": "string", "enum": ["admin", "sarpras", "pemohon"] },
+        "unitId": { "type": "string" },
+        "status": { "type": "string", "enum": ["aktif", "nonaktif"] },
+        "createdAt": { "type": "string" },
+        "updatedAt": { "type": "string" }
+      },
+      "required": ["uid", "username", "nama", "role", "status"]
+    },
+    "Unit": {
+      "title": "Unit",
+      "description": "Work units or departments in SMKN 1 Tegalsari",
+      "type": "object",
+      "properties": {
+        "nama": { "type": "string" },
+        "status": { "type": "string", "enum": ["aktif", "nonaktif"] },
+        "createdAt": { "type": "string" },
+        "updatedAt": { "type": "string" }
+      },
+      "required": ["nama", "status"]
+    },
+    "Vehicle": {
+      "title": "Vehicle",
+      "description": "School vehicles for borrowing",
+      "type": "object",
+      "properties": {
+        "kode": { "type": "string" },
+        "nama": { "type": "string" },
+        "jenis": { "type": "string" },
+        "nomorPolisi": { "type": "string" },
+        "tahun": { "type": "string" },
+        "kapasitas": { "type": "number" },
+        "status": { "type": "string", "enum": ["TERSEDIA", "DIGUNAKAN", "SERVIS", "TIDAK AKTIF"] },
+        "keterangan": { "type": "string" },
+        "createdAt": { "type": "string" },
+        "updatedAt": { "type": "string" }
+      },
+      "required": ["kode", "nama", "nomorPolisi", "status"]
+    },
+    "Room": {
+      "title": "Room",
+      "description": "Rooms in the school",
+      "type": "object",
+      "properties": {
+        "kode": { "type": "string" },
+        "nama": { "type": "string" },
+        "kapasitas": { "type": "number" },
+        "lokasi": { "type": "string" },
+        "status": { "type": "string", "enum": ["TERSEDIA", "DIGUNAKAN", "RENOVASI", "TIDAK AKTIF"] },
+        "keterangan": { "type": "string" },
+        "createdAt": { "type": "string" },
+        "updatedAt": { "type": "string" }
+      },
+      "required": ["kode", "nama", "status"]
+    },
+    "Facility": {
+      "title": "Facility",
+      "description": "School facilities and equipment",
+      "type": "object",
+      "properties": {
+        "nama": { "type": "string" },
+        "jumlah": { "type": "number" },
+        "kondisi": { "type": "string", "enum": ["BAIK", "RUSAK RINGAN", "RUSAK BERAT"] },
+        "lokasi": { "type": "string" },
+        "keterangan": { "type": "string" },
+        "createdAt": { "type": "string" },
+        "updatedAt": { "type": "string" }
+      },
+      "required": ["nama", "jumlah", "kondisi"]
+    },
+    "CarBorrowing": {
+      "title": "CarBorrowing",
+      "description": "Car borrowing application and reservation",
+      "type": "object",
+      "properties": {
+        "nomorPengajuan": { "type": "string" },
+        "userId": { "type": "string" },
+        "userNama": { "type": "string" },
+        "userUnit": { "type": "string" },
+        "kegiatan": { "type": "string" },
+        "tujuanRute": { "type": "string" },
+        "kmAwal": { "type": "string" },
+        "tanggalPinjam": { "type": "string" },
+        "jamBerangkat": { "type": "string" },
+        "perkiraanKembali": { "type": "string" },
+        "vehicleId": { "type": "string" },
+        "vehicleNama": { "type": "string" },
+        "vehicleNoPol": { "type": "string" },
+        "driverNama": { "type": "string" },
+        "driverHp": { "type": "string" },
+        "bbmPercent": { "type": "number" },
+        "fotoDepan": { "type": "string" },
+        "fotoKanan": { "type": "string" },
+        "fotoKiri": { "type": "string" },
+        "fotoBelakang": { "type": "string" },
+        "disetujuiOleh": { "type": "string" },
+        "disetujuiJabatan": { "type": "string" },
+        "catatan": { "type": "string" },
+        "status": { "type": "string", "enum": ["DRAFT", "MENUNGGU PERSETUJUAN", "DISETUJUI", "DITOLAK", "SELESAI", "DIBATALKAN"] },
+        "catatanPetugas": { "type": "string" },
+        "createdAt": { "type": "string" },
+        "updatedAt": { "type": "string" }
+      },
+      "required": ["nomorPengajuan", "userId", "userNama", "kegiatan", "tanggalPinjam", "jamBerangkat", "perkiraanKembali", "vehicleId", "driverNama", "driverHp", "status"]
+    },
+    "HallBooking": {
+      "title": "HallBooking",
+      "description": "School hall and auditorium usage booking",
+      "type": "object",
+      "properties": {
+        "nomorPengajuan": { "type": "string" },
+        "userId": { "type": "string" },
+        "userNama": { "type": "string" },
+        "userUnit": { "type": "string" },
+        "namaKegiatan": { "type": "string" },
+        "keperluan": { "type": "string" },
+        "tanggalKegiatan": { "type": "string" },
+        "jamMulai": { "type": "string" },
+        "jamSelesai": { "type": "string" },
+        "jumlahPeserta": { "type": "number" },
+        "fasilitas": { "type": "array" },
+        "fasilitasLainnya": { "type": "string" },
+        "disetujuiOleh": { "type": "string" },
+        "disetujuiJabatan": { "type": "string" },
+        "keterangan": { "type": "string" },
+        "status": { "type": "string", "enum": ["DRAFT", "MENUNGGU PERSETUJUAN", "DISETUJUI", "DITOLAK", "SELESAI", "DIBATALKAN"] },
+        "catatanPetugas": { "type": "string" },
+        "createdAt": { "type": "string" },
+        "updatedAt": { "type": "string" }
+      },
+      "required": ["nomorPengajuan", "userId", "userNama", "namaKegiatan", "tanggalKegiatan", "jamMulai", "jamSelesai", "jumlahPeserta", "status"]
+    },
+    "Notification": {
+      "title": "Notification",
+      "description": "User notifications for application updates",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "targetRole": { "type": "string" },
+        "title": { "type": "string" },
+        "message": { "type": "string" },
+        "link": { "type": "string" },
+        "read": { "type": "boolean" },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["title", "message", "read"]
+    },
+    "StatusHistory": {
+      "title": "StatusHistory",
+      "description": "Audit trail log of status changes for borrowings and bookings",
+      "type": "object",
+      "properties": {
+        "recordId": { "type": "string" },
+        "jenisPengajuan": { "type": "string", "enum": ["MOBIL", "AULA"] },
+        "statusLama": { "type": "string" },
+        "statusBaru": { "type": "string" },
+        "userId": { "type": "string" },
+        "userNama": { "type": "string" },
+        "catatan": { "type": "string" },
+        "timestamp": { "type": "string" }
+      },
+      "required": ["recordId", "jenisPengajuan", "statusLama", "statusBaru", "userId", "timestamp"]
+    },
+    "Setting": {
+      "title": "Setting",
+      "description": "School settings and document letterhead info",
+      "type": "object",
+      "properties": {
+        "namaSekolah": { "type": "string" },
+        "instansi": { "type": "string" },
+        "dinas": { "type": "string" },
+        "alamat": { "type": "string" },
+        "telepon": { "type": "string" },
+        "email": { "type": "string" },
+        "logoUrl": { "type": "string" },
+        "namaPejabat": { "type": "string" },
+        "jabatanPejabat": { "type": "string" },
+        "nipPejabat": { "type": "string" },
+        "tandaTanganUrl": { "type": "string" },
+        "updatedAt": { "type": "string" }
+      },
+      "required": ["namaSekolah", "instansi"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "User",
+      "description": "User profiles and credentials"
+    },
+    "/units/{unitId}": {
+      "schema": "Unit",
+      "description": "School organizational units"
+    },
+    "/vehicles/{vehicleId}": {
+      "schema": "Vehicle",
+      "description": "School vehicles"
+    },
+    "/rooms/{roomId}": {
+      "schema": "Room",
+      "description": "School rooms and halls"
+    },
+    "/facilities/{facilityId}": {
+      "schema": "Facility",
+      "description": "School facilities and assets"
+    },
+    "/carBorrowings/{borrowingId}": {
+      "schema": "CarBorrowing",
+      "description": "Car borrowing requests"
+    },
+    "/hallBookings/{bookingId}": {
+      "schema": "HallBooking",
+      "description": "Hall reservation requests"
+    },
+    "/notifications/{notificationId}": {
+      "schema": "Notification",
+      "description": "System and status notifications"
+    },
+    "/statusHistory/{historyId}": {
+      "schema": "StatusHistory",
+      "description": "Status change history logs"
+    },
+    "/settings/{settingId}": {
+      "schema": "Setting",
+      "description": "Global school administrative settings"
+    }
+  }
+}

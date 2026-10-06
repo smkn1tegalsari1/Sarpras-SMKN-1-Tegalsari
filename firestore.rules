@@ -1,0 +1,66 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Default deny for unspecified documents
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Users collection
+    match /users/{userId} {
+      allow read, write: if true;
+    }
+
+    // Units collection
+    match /units/{unitId} {
+      allow read, write: if true;
+    }
+
+    // Vehicles collection
+    match /vehicles/{vehicleId} {
+      allow read, write: if true;
+    }
+
+    // Rooms collection
+    match /rooms/{roomId} {
+      allow read, write: if true;
+    }
+
+    // Facilities collection
+    match /facilities/{facilityId} {
+      allow read, write: if true;
+    }
+
+    // Car Borrowings
+    match /carBorrowings/{borrowingId} {
+      allow read, write: if true;
+    }
+
+    // Hall Bookings
+    match /hallBookings/{bookingId} {
+      allow read, write: if true;
+    }
+
+    // Equipment Borrowings
+    match /equipmentBorrowings/{borrowingId} {
+      allow read, write: if true;
+    }
+
+    // Notifications
+    match /notifications/{notificationId} {
+      allow read, write: if true;
+    }
+
+    // Status History
+    match /statusHistory/{historyId} {
+      allow read, write: if true;
+    }
+
+    // Settings
+    match /settings/{settingId} {
+      allow read, write: if true;
+    }
+  }
+}
