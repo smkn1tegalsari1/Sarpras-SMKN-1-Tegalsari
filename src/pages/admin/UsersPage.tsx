@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { UserProfile, UserRole, UnitKerja } from '../../types';
 import { Modal } from '../../components/common/Modal';
+import { ConfirmDeleteModal } from '../../components/common/ConfirmDeleteModal';
 import { collection, doc, setDoc, updateDoc, deleteDoc } from 'firebase/firestore';
 import { db, handleFirestoreError, OperationType } from '../../lib/firebase';
 import {
@@ -14,6 +15,7 @@ import {
   EyeOff,
   Trash2,
   CheckCircle2,
+  AlertTriangle,
   Lock,
   UserCheck,
 } from 'lucide-react';
@@ -39,6 +41,10 @@ export const UsersPage: React.FC<UsersPageProps> = ({ users, units }) => {
   const [unitNama, setUnitNama] = useState('');
   const [status, setStatus] = useState<'aktif' | 'nonaktif'>('aktif');
   const [isSaving, setIsSaving] = useState(false);
+  const [formError, setFormError] = useState<string | null>(null);
+
+  // Modal Delete
+  const [userToDelete, setUserToDelete] = useState<UserProfile | null>(null);
 
   // Modal Reset Password Khusus
   const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
@@ -47,6 +53,7 @@ export const UsersPage: React.FC<UsersPageProps> = ({ users, units }) => {
   const [showNewPassword, setShowNewPassword] = useState(true);
   const [isSavingPassword, setIsSavingPassword] = useState(false);
   const [successNotif, setSuccessNotif] = useState<string | null>(null);
+  const [errorNotif, setErrorNotif] = useState<string | null>(null);
 
   // Reveal password map in table
   const [visiblePasswords, setVisiblePasswords] = useState<Record<string, boolean>>({});
@@ -64,6 +71,7 @@ export const UsersPage: React.FC<UsersPageProps> = ({ users, units }) => {
     setRole('pemohon');
     setUnitNama(units[0]?.nama || 'Teknik Komputer & Jaringan (TKJ)');
     setStatus('aktif');
+    setFormError(null);
     setIsModalOpen(true);
   };
 
@@ -76,6 +84,7 @@ export const UsersPage: React.FC<UsersPageProps> = ({ users, units }) => {
     setRole(u.role);
     setUnitNama(u.unitNama || units[0]?.nama || '');
     setStatus(u.status);
+    setFormError(null);
     setIsModalOpen(true);
   };
 
@@ -88,12 +97,23 @@ export const UsersPage: React.FC<UsersPageProps> = ({ users, units }) => {
 
   const handleSaveUser = async (e: React.FormEvent) => {
     e.preventDefault();
+    setFormError(null);
     const cleanUsername = username.trim().toLowerCase();
     if (!cleanUsername || !nama.trim()) return;
 
     setIsSaving(true);
     try {
       if (editingUser) {
+        // Check if username changed and conflicts with another user
+        const conflict = users.some(
+          (u) => u.id !== editingUser.id && u.username?.toLowerCase() === cleanUsername
+        );
+        if (conflict) {
+          setFormError(`Username "${cleanUsername}" sudah digunakan oleh pengguna lain.`);
+          setIsSaving(false);
+          return;
+        }
+
         const ref = doc(db, 'users', editingUser.id);
         const updatePayload: Record<string, any> = {
           username: cleanUsername,
@@ -115,7 +135,7 @@ export const UsersPage: React.FC<UsersPageProps> = ({ users, units }) => {
           (u) => u.username?.toLowerCase() === cleanUsername
         );
         if (exists) {
-          alert(`Username "${cleanUsername}" sudah digunakan. Silakan gunakan username lain.`);
+          setFormError(`Username "${cleanUsername}" sudah digunakan. Silakan pilih username lain.`);
           setIsSaving(false);
           return;
         }
@@ -138,7 +158,8 @@ export const UsersPage: React.FC<UsersPageProps> = ({ users, units }) => {
         showSuccess(`Pengguna baru "${cleanUsername}" berhasil ditambahkan.`);
       }
       setIsModalOpen(false);
-    } catch (err) {
+    } catch (err: any) {
+      showError(`Gagal menyimpan pengguna: ${err?.message || 'Terjadi kesalahan'}`);
       handleFirestoreError(err, OperationType.WRITE, 'users');
     } finally {
       setIsSaving(false);
@@ -160,31 +181,40 @@ export const UsersPage: React.FC<UsersPageProps> = ({ users, units }) => {
         `Password untuk pengguna "${userToResetPassword.username || userToResetPassword.nama}" berhasil diubah.`
       );
       setIsPasswordModalOpen(false);
-    } catch (err) {
+    } catch (err: any) {
+      showError(`Gagal mengubah password: ${err?.message || 'Terjadi kesalahan'}`);
       handleFirestoreError(err, OperationType.UPDATE, `users/${userToResetPassword.id}`);
     } finally {
       setIsSavingPassword(false);
     }
   };
 
-  const handleDeleteUser = async (u: UserProfile) => {
-    if (
-      !confirm(
-        `Apakah Anda yakin ingin menghapus akun pengguna "${u.username || u.nama}"?`
-      )
-    )
+  const handleConfirmDeleteUser = async () => {
+    if (!userToDelete) return;
+    if (userToDelete.username?.toLowerCase() === 'admin') {
+      showError('Akun Administrator utama tidak dapat dihapus demi keamanan sistem.');
+      setUserToDelete(null);
       return;
+    }
     try {
-      await deleteDoc(doc(db, 'users', u.id));
-      showSuccess(`Pengguna "${u.username || u.nama}" berhasil dihapus.`);
-    } catch (err) {
-      handleFirestoreError(err, OperationType.DELETE, `users/${u.id}`);
+      await deleteDoc(doc(db, 'users', userToDelete.id));
+      showSuccess(`Pengguna "${userToDelete.username || userToDelete.nama}" berhasil dihapus.`);
+      setUserToDelete(null);
+    } catch (err: any) {
+      showError(`Gagal menghapus pengguna: ${err?.message || 'Terjadi kesalahan'}`);
+      handleFirestoreError(err, OperationType.DELETE, `users/${userToDelete.id}`);
     }
   };
 
   const showSuccess = (msg: string) => {
     setSuccessNotif(msg);
+    setErrorNotif(null);
     setTimeout(() => setSuccessNotif(null), 4000);
+  };
+
+  const showError = (msg: string) => {
+    setErrorNotif(msg);
+    setTimeout(() => setErrorNotif(null), 5000);
   };
 
   const filteredUsers = users.filter((u) => {
@@ -222,11 +252,17 @@ export const UsersPage: React.FC<UsersPageProps> = ({ users, units }) => {
         </button>
       </div>
 
-      {/* Alert Notifikasi Sukses */}
+      {/* Alert Notifikasi Sukses / Error */}
       {successNotif && (
         <div className="p-3.5 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-bold flex items-center gap-2 animate-in fade-in">
           <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
           <span>{successNotif}</span>
+        </div>
+      )}
+      {errorNotif && (
+        <div className="p-3.5 rounded-2xl bg-rose-50 border border-rose-200 text-rose-800 text-xs font-bold flex items-center gap-2 animate-in fade-in">
+          <AlertTriangle className="w-4 h-4 text-rose-600 shrink-0" />
+          <span>{errorNotif}</span>
         </div>
       )}
 
@@ -363,7 +399,7 @@ export const UsersPage: React.FC<UsersPageProps> = ({ users, units }) => {
                         </button>
 
                         <button
-                          onClick={() => handleDeleteUser(u)}
+                          onClick={() => setUserToDelete(u)}
                           className="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition"
                           title="Hapus Pengguna"
                         >
@@ -379,6 +415,20 @@ export const UsersPage: React.FC<UsersPageProps> = ({ users, units }) => {
         </table>
       </div>
 
+      {/* Confirm Delete Modal */}
+      <ConfirmDeleteModal
+        isOpen={!!userToDelete}
+        onClose={() => setUserToDelete(null)}
+        onConfirm={handleConfirmDeleteUser}
+        itemName={userToDelete?.username ? `@${userToDelete.username} (${userToDelete.nama})` : userToDelete?.nama}
+        title="Hapus Akun Pengguna"
+        message={
+          userToDelete?.username === 'admin'
+            ? 'Akun administrator utama tidak boleh dihapus demi keamanan sistem.'
+            : undefined
+        }
+      />
+
       {/* Modal Tambah / Edit Pengguna */}
       <Modal
         isOpen={isModalOpen}
@@ -387,6 +437,12 @@ export const UsersPage: React.FC<UsersPageProps> = ({ users, units }) => {
         subtitle="Kelola username, password, dan hak akses internal SMKN 1 Tegalsari"
       >
         <form onSubmit={handleSaveUser} className="space-y-4 text-xs">
+          {formError && (
+            <div className="p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-xs font-semibold flex items-center gap-2">
+              <AlertTriangle className="w-4 h-4 text-rose-600 shrink-0" />
+              <span>{formError}</span>
+            </div>
+          )}
           <div>
             <label className="block font-bold text-slate-700 mb-1">
               Username * (Untuk Login)

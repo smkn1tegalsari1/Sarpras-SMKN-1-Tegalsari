@@ -5,7 +5,7 @@ import { Modal } from '../../components/common/Modal';
 import { ConfirmDeleteModal } from '../../components/common/ConfirmDeleteModal';
 import { collection, doc, setDoc, deleteDoc, updateDoc } from 'firebase/firestore';
 import { db, handleFirestoreError, OperationType } from '../../lib/firebase';
-import { Wrench, Plus, Search, Edit2, Trash2, CheckCircle2 } from 'lucide-react';
+import { Wrench, Plus, Search, Edit2, Trash2, CheckCircle2, AlertTriangle } from 'lucide-react';
 
 interface FacilitiesPageProps {
   facilities: Facility[];
@@ -25,6 +25,19 @@ export const FacilitiesPage: React.FC<FacilitiesPageProps> = ({ facilities }) =>
   const [lokasi, setLokasi] = useState('');
   const [keterangan, setKeterangan] = useState('');
   const [isSaving, setIsSaving] = useState(false);
+  const [successNotif, setSuccessNotif] = useState<string | null>(null);
+  const [errorNotif, setErrorNotif] = useState<string | null>(null);
+
+  const showSuccess = (msg: string) => {
+    setSuccessNotif(msg);
+    setErrorNotif(null);
+    setTimeout(() => setSuccessNotif(null), 4000);
+  };
+
+  const showError = (msg: string) => {
+    setErrorNotif(msg);
+    setTimeout(() => setErrorNotif(null), 5000);
+  };
 
   const openAddModal = () => {
     setEditingFacility(null);
@@ -62,6 +75,7 @@ export const FacilitiesPage: React.FC<FacilitiesPageProps> = ({ facilities }) =>
           keterangan,
           updatedAt: new Date().toISOString(),
         });
+        showSuccess(`Data fasilitas "${nama}" berhasil diperbarui.`);
       } else {
         const ref = doc(collection(db, 'facilities'));
         await setDoc(ref, {
@@ -74,9 +88,11 @@ export const FacilitiesPage: React.FC<FacilitiesPageProps> = ({ facilities }) =>
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),
         });
+        showSuccess(`Fasilitas baru "${nama}" berhasil ditambahkan.`);
       }
       setIsModalOpen(false);
-    } catch (err) {
+    } catch (err: any) {
+      showError(`Gagal menyimpan data: ${err?.message || 'Terjadi kesalahan'}`);
       handleFirestoreError(err, OperationType.WRITE, 'facilities');
     } finally {
       setIsSaving(false);
@@ -87,8 +103,10 @@ export const FacilitiesPage: React.FC<FacilitiesPageProps> = ({ facilities }) =>
     if (!facilityToDelete) return;
     try {
       await deleteDoc(doc(db, 'facilities', facilityToDelete.id));
+      showSuccess(`Data fasilitas "${facilityToDelete.nama}" berhasil dihapus.`);
       setFacilityToDelete(null);
-    } catch (err) {
+    } catch (err: any) {
+      showError(`Gagal menghapus fasilitas: ${err?.message || 'Terjadi kesalahan'}`);
       handleFirestoreError(err, OperationType.DELETE, `facilities/${facilityToDelete.id}`);
     }
   };
@@ -125,6 +143,20 @@ export const FacilitiesPage: React.FC<FacilitiesPageProps> = ({ facilities }) =>
           <Plus className="w-4 h-4" /> Tambah Fasilitas
         </button>
       </div>
+
+      {/* Alert Notifikasi Sukses / Error */}
+      {successNotif && (
+        <div className="p-3.5 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-bold flex items-center gap-2 animate-in fade-in">
+          <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+          <span>{successNotif}</span>
+        </div>
+      )}
+      {errorNotif && (
+        <div className="p-3.5 rounded-2xl bg-rose-50 border border-rose-200 text-rose-800 text-xs font-bold flex items-center gap-2 animate-in fade-in">
+          <AlertTriangle className="w-4 h-4 text-rose-600 shrink-0" />
+          <span>{errorNotif}</span>
+        </div>
+      )}
 
       <div className="flex flex-col sm:flex-row gap-3">
         <div className="relative flex-1">

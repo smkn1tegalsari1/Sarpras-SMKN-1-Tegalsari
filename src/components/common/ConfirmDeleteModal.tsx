@@ -20,12 +20,22 @@ export const ConfirmDeleteModal: React.FC<ConfirmDeleteModalProps> = ({
   message,
 }) => {
   const [isDeleting, setIsDeleting] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+  React.useEffect(() => {
+    if (isOpen) {
+      setErrorMessage(null);
+    }
+  }, [isOpen]);
 
   const handleConfirm = async () => {
     setIsDeleting(true);
+    setErrorMessage(null);
     try {
       await onConfirm();
       onClose();
+    } catch (err: any) {
+      setErrorMessage(err?.message || 'Terjadi kesalahan saat menghapus data.');
     } finally {
       setIsDeleting(false);
     }
@@ -50,6 +60,12 @@ export const ConfirmDeleteModal: React.FC<ConfirmDeleteModalProps> = ({
             </p>
           </div>
         </div>
+
+        {errorMessage && (
+          <div className="p-3 rounded-xl bg-red-100 text-red-800 border border-red-200 text-xs font-semibold">
+            {errorMessage}
+          </div>
+        )}
 
         <div className="pt-2 flex justify-end gap-2">
           <button

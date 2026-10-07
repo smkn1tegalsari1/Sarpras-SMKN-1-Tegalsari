@@ -533,6 +533,32 @@ export async function createNotification(params: {
   }
 }
 
+export async function markNotificationAsRead(notificationId: string): Promise<void> {
+  try {
+    const notifRef = doc(db, 'notifications', notificationId);
+    await updateDoc(notifRef, {
+      read: true,
+      updatedAt: new Date().toISOString(),
+    });
+  } catch (err) {
+    console.error('Failed to mark notification as read:', err);
+  }
+}
+
+export async function markAllNotificationsAsRead(notificationIds: string[]): Promise<void> {
+  try {
+    const promises = notificationIds.map((id) =>
+      updateDoc(doc(db, 'notifications', id), {
+        read: true,
+        updatedAt: new Date().toISOString(),
+      })
+    );
+    await Promise.all(promises);
+  } catch (err) {
+    console.error('Failed to mark all notifications as read:', err);
+  }
+}
+
 // ==========================================
 // REAL-TIME HELPERS
 // ==========================================

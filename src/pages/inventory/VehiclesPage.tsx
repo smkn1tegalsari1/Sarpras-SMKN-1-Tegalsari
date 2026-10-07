@@ -38,6 +38,19 @@ export const VehiclesPage: React.FC<VehiclesPageProps> = ({ vehicles }) => {
   const [status, setStatus] = useState<VehicleStatus>('TERSEDIA');
   const [keterangan, setKeterangan] = useState('');
   const [isSaving, setIsSaving] = useState(false);
+  const [successNotif, setSuccessNotif] = useState<string | null>(null);
+  const [errorNotif, setErrorNotif] = useState<string | null>(null);
+
+  const showSuccess = (msg: string) => {
+    setSuccessNotif(msg);
+    setErrorNotif(null);
+    setTimeout(() => setSuccessNotif(null), 4000);
+  };
+
+  const showError = (msg: string) => {
+    setErrorNotif(msg);
+    setTimeout(() => setErrorNotif(null), 5000);
+  };
 
   const openAddModal = () => {
     setEditingVehicle(null);
@@ -84,6 +97,7 @@ export const VehiclesPage: React.FC<VehiclesPageProps> = ({ vehicles }) => {
           keterangan,
           updatedAt: new Date().toISOString(),
         });
+        showSuccess(`Data kendaraan "${nama}" berhasil diperbarui.`);
       } else {
         const ref = doc(collection(db, 'vehicles'));
         await setDoc(ref, {
@@ -99,9 +113,11 @@ export const VehiclesPage: React.FC<VehiclesPageProps> = ({ vehicles }) => {
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),
         });
+        showSuccess(`Kendaraan baru "${nama}" (${nomorPolisi}) berhasil ditambahkan.`);
       }
       setIsModalOpen(false);
-    } catch (err) {
+    } catch (err: any) {
+      showError(`Gagal menyimpan data armada: ${err?.message || 'Terjadi kesalahan'}`);
       handleFirestoreError(err, OperationType.WRITE, 'vehicles');
     } finally {
       setIsSaving(false);
@@ -112,8 +128,10 @@ export const VehiclesPage: React.FC<VehiclesPageProps> = ({ vehicles }) => {
     if (!vehicleToDelete) return;
     try {
       await deleteDoc(doc(db, 'vehicles', vehicleToDelete.id));
+      showSuccess(`Armada "${vehicleToDelete.nama}" (${vehicleToDelete.nomorPolisi}) berhasil dihapus.`);
       setVehicleToDelete(null);
-    } catch (err) {
+    } catch (err: any) {
+      showError(`Gagal menghapus kendaraan: ${err?.message || 'Terjadi kesalahan'}`);
       handleFirestoreError(err, OperationType.DELETE, `vehicles/${vehicleToDelete.id}`);
     }
   };
@@ -152,6 +170,20 @@ export const VehiclesPage: React.FC<VehiclesPageProps> = ({ vehicles }) => {
           <Plus className="w-4 h-4" /> Tambah Kendaraan
         </button>
       </div>
+
+      {/* Alert Notifikasi Sukses / Error */}
+      {successNotif && (
+        <div className="p-3.5 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-bold flex items-center gap-2 animate-in fade-in">
+          <CheckCircle className="w-4 h-4 text-emerald-600 shrink-0" />
+          <span>{successNotif}</span>
+        </div>
+      )}
+      {errorNotif && (
+        <div className="p-3.5 rounded-2xl bg-rose-50 border border-rose-200 text-rose-800 text-xs font-bold flex items-center gap-2 animate-in fade-in">
+          <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />
+          <span>{errorNotif}</span>
+        </div>
+      )}
 
       {/* Filter and Search */}
       <div className="flex flex-col sm:flex-row gap-3">
@@ -249,7 +281,7 @@ export const VehiclesPage: React.FC<VehiclesPageProps> = ({ vehicles }) => {
                           <Edit2 className="w-4 h-4" />
                         </button>
                         <button
-                          onClick={() => handleDelete(v.id)}
+                          onClick={() => setVehicleToDelete(v)}
                           className="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition"
                           title="Hapus Kendaraan"
                         >
@@ -264,6 +296,15 @@ export const VehiclesPage: React.FC<VehiclesPageProps> = ({ vehicles }) => {
           </div>
         )}
       </div>
+
+      {/* Confirm Delete Modal */}
+      <ConfirmDeleteModal
+        isOpen={!!vehicleToDelete}
+        onClose={() => setVehicleToDelete(null)}
+        onConfirm={handleConfirmDelete}
+        itemName={vehicleToDelete ? `${vehicleToDelete.nama} (${vehicleToDelete.nomorPolisi})` : undefined}
+        title="Hapus Data Kendaraan Operasional"
+      />
 
       {/* Add / Edit Modal */}
       <Modal

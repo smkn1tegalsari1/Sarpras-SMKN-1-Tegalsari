@@ -5,7 +5,7 @@ import { Modal } from '../../components/common/Modal';
 import { ConfirmDeleteModal } from '../../components/common/ConfirmDeleteModal';
 import { collection, doc, setDoc, deleteDoc, updateDoc } from 'firebase/firestore';
 import { db, handleFirestoreError, OperationType } from '../../lib/firebase';
-import { DoorOpen, Plus, Search, Edit2, Trash2 } from 'lucide-react';
+import { DoorOpen, Plus, Search, Edit2, Trash2, CheckCircle2, AlertTriangle } from 'lucide-react';
 
 interface RoomsPageProps {
   rooms: Room[];
@@ -26,6 +26,19 @@ export const RoomsPage: React.FC<RoomsPageProps> = ({ rooms }) => {
   const [status, setStatus] = useState<RoomStatus>('TERSEDIA');
   const [keterangan, setKeterangan] = useState('');
   const [isSaving, setIsSaving] = useState(false);
+  const [successNotif, setSuccessNotif] = useState<string | null>(null);
+  const [errorNotif, setErrorNotif] = useState<string | null>(null);
+
+  const showSuccess = (msg: string) => {
+    setSuccessNotif(msg);
+    setErrorNotif(null);
+    setTimeout(() => setSuccessNotif(null), 4000);
+  };
+
+  const showError = (msg: string) => {
+    setErrorNotif(msg);
+    setTimeout(() => setErrorNotif(null), 5000);
+  };
 
   const openAddModal = () => {
     setEditingRoom(null);
@@ -66,6 +79,7 @@ export const RoomsPage: React.FC<RoomsPageProps> = ({ rooms }) => {
           keterangan,
           updatedAt: new Date().toISOString(),
         });
+        showSuccess(`Data ruangan "${nama}" berhasil diperbarui.`);
       } else {
         const ref = doc(collection(db, 'rooms'));
         await setDoc(ref, {
@@ -79,9 +93,11 @@ export const RoomsPage: React.FC<RoomsPageProps> = ({ rooms }) => {
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),
         });
+        showSuccess(`Ruangan baru "${nama}" berhasil ditambahkan.`);
       }
       setIsModalOpen(false);
-    } catch (err) {
+    } catch (err: any) {
+      showError(`Gagal menyimpan data ruangan: ${err?.message || 'Terjadi kesalahan'}`);
       handleFirestoreError(err, OperationType.WRITE, 'rooms');
     } finally {
       setIsSaving(false);
@@ -92,8 +108,10 @@ export const RoomsPage: React.FC<RoomsPageProps> = ({ rooms }) => {
     if (!roomToDelete) return;
     try {
       await deleteDoc(doc(db, 'rooms', roomToDelete.id));
+      showSuccess(`Data ruangan "${roomToDelete.nama}" berhasil dihapus.`);
       setRoomToDelete(null);
-    } catch (err) {
+    } catch (err: any) {
+      showError(`Gagal menghapus ruangan: ${err?.message || 'Terjadi kesalahan'}`);
       handleFirestoreError(err, OperationType.DELETE, `rooms/${roomToDelete.id}`);
     }
   };
@@ -131,6 +149,20 @@ export const RoomsPage: React.FC<RoomsPageProps> = ({ rooms }) => {
           <Plus className="w-4 h-4" /> Tambah Ruangan
         </button>
       </div>
+
+      {/* Alert Notifikasi Sukses / Error */}
+      {successNotif && (
+        <div className="p-3.5 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-bold flex items-center gap-2 animate-in fade-in">
+          <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+          <span>{successNotif}</span>
+        </div>
+      )}
+      {errorNotif && (
+        <div className="p-3.5 rounded-2xl bg-rose-50 border border-rose-200 text-rose-800 text-xs font-bold flex items-center gap-2 animate-in fade-in">
+          <AlertTriangle className="w-4 h-4 text-rose-600 shrink-0" />
+          <span>{errorNotif}</span>
+        </div>
+      )}
 
       <div className="flex flex-col sm:flex-row gap-3">
         <div className="relative flex-1">

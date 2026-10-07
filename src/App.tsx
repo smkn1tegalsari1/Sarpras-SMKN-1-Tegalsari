@@ -52,6 +52,8 @@ import {
   DEFAULT_SETTINGS,
   logStatusHistory,
   createNotification,
+  markNotificationAsRead,
+  markAllNotificationsAsRead,
 } from './services/db';
 import { doc, updateDoc } from 'firebase/firestore';
 import { db, handleFirestoreError, OperationType } from './lib/firebase';
@@ -330,10 +332,13 @@ const AppContent: React.FC = () => {
               vehicles={vehicles}
               rooms={rooms}
               facilities={facilities}
+              notifications={notifications}
               onNavigate={(tab) => setActiveTab(tab)}
               onOpenCarDetail={(item) => setSelectedCarDetail(item)}
               onOpenHallDetail={(item) => setSelectedHallDetail(item)}
               onOpenEquipmentDetail={(item) => setSelectedEquipmentDetail(item)}
+              onMarkNotificationAsRead={markNotificationAsRead}
+              onMarkAllNotificationsAsRead={markAllNotificationsAsRead}
             />
           )}
 

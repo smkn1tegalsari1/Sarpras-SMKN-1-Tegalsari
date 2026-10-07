@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import { UnitKerja } from '../../types';
 import { Modal } from '../../components/common/Modal';
-import { collection, doc, setDoc, updateDoc } from 'firebase/firestore';
+import { ConfirmDeleteModal } from '../../components/common/ConfirmDeleteModal';
+import { collection, doc, setDoc, updateDoc, deleteDoc } from 'firebase/firestore';
 import { db, handleFirestoreError, OperationType } from '../../lib/firebase';
-import { Briefcase, Plus, Search, Edit2, Power } from 'lucide-react';
+import { Briefcase, Plus, Search, Edit2, Power, Trash2, CheckCircle2, AlertTriangle } from 'lucide-react';
 
 interface UnitsPageProps {
   units: UnitKerja[];
@@ -13,10 +14,24 @@ export const UnitsPage: React.FC<UnitsPageProps> = ({ units }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingUnit, setEditingUnit] = useState<UnitKerja | null>(null);
+  const [unitToDelete, setUnitToDelete] = useState<UnitKerja | null>(null);
 
   const [nama, setNama] = useState('');
   const [status, setStatus] = useState<'aktif' | 'nonaktif'>('aktif');
   const [isSaving, setIsSaving] = useState(false);
+  const [successNotif, setSuccessNotif] = useState<string | null>(null);
+  const [errorNotif, setErrorNotif] = useState<string | null>(null);
+
+  const showSuccess = (msg: string) => {
+    setSuccessNotif(msg);
+    setErrorNotif(null);
+    setTimeout(() => setSuccessNotif(null), 4000);
+  };
+
+  const showError = (msg: string) => {
+    setErrorNotif(msg);
+    setTimeout(() => setErrorNotif(null), 5000);
+  };
 
   const openAddModal = () => {
     setEditingUnit(null);
@@ -45,6 +60,7 @@ export const UnitsPage: React.FC<UnitsPageProps> = ({ units }) => {
           status,
           updatedAt: new Date().toISOString(),
         });
+        showSuccess(`Unit kerja "${nama}" berhasil diperbarui.`);
       } else {
         const ref = doc(collection(db, 'units'));
         await setDoc(ref, {
@@ -54,9 +70,11 @@ export const UnitsPage: React.FC<UnitsPageProps> = ({ units }) => {
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),
         });
+        showSuccess(`Unit kerja "${nama}" berhasil ditambahkan.`);
       }
       setIsModalOpen(false);
-    } catch (err) {
+    } catch (err: any) {
+      showError(`Gagal menyimpan unit kerja: ${err?.message || 'Terjadi kesalahan'}`);
       handleFirestoreError(err, OperationType.WRITE, 'units');
     } finally {
       setIsSaving(false);
@@ -70,8 +88,22 @@ export const UnitsPage: React.FC<UnitsPageProps> = ({ units }) => {
         status: newStatus,
         updatedAt: new Date().toISOString(),
       });
-    } catch (err) {
+      showSuccess(`Status unit "${u.nama}" berhasil diubah menjadi ${newStatus}.`);
+    } catch (err: any) {
+      showError(`Gagal mengubah status: ${err?.message || 'Terjadi kesalahan'}`);
       handleFirestoreError(err, OperationType.UPDATE, `units/${u.id}`);
+    }
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!unitToDelete) return;
+    try {
+      await deleteDoc(doc(db, 'units', unitToDelete.id));
+      showSuccess(`Unit kerja "${unitToDelete.nama}" berhasil dihapus.`);
+      setUnitToDelete(null);
+    } catch (err: any) {
+      showError(`Gagal menghapus unit kerja: ${err?.message || 'Terjadi kesalahan'}`);
+      handleFirestoreError(err, OperationType.DELETE, `units/${unitToDelete.id}`);
     }
   };
 
@@ -103,6 +135,20 @@ export const UnitsPage: React.FC<UnitsPageProps> = ({ units }) => {
           <Plus className="w-4 h-4" /> Tambah Unit Kerja
         </button>
       </div>
+
+      {/* Alert Notifikasi Sukses / Error */}
+      {successNotif && (
+        <div className="p-3.5 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-bold flex items-center gap-2 animate-in fade-in">
+          <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+          <span>{successNotif}</span>
+        </div>
+      )}
+      {errorNotif && (
+        <div className="p-3.5 rounded-2xl bg-rose-50 border border-rose-200 text-rose-800 text-xs font-bold flex items-center gap-2 animate-in fade-in">
+          <AlertTriangle className="w-4 h-4 text-rose-600 shrink-0" />
+          <span>{errorNotif}</span>
+        </div>
+      )}
 
       <div className="relative max-w-md">
         <Search className="w-4 h-4 absolute left-3.5 top-3 text-slate-400" />
@@ -166,12 +212,19 @@ export const UnitsPage: React.FC<UnitsPageProps> = ({ units }) => {
                       onClick={() => handleToggleStatus(u)}
                       className={`p-1.5 rounded-lg transition ${
                         u.status === 'aktif'
-                          ? 'text-slate-400 hover:text-rose-600 hover:bg-rose-50'
+                          ? 'text-slate-400 hover:text-amber-600 hover:bg-amber-50'
                           : 'text-emerald-600 hover:bg-emerald-50'
                       }`}
                       title={u.status === 'aktif' ? 'Nonaktifkan Unit' : 'Aktifkan Unit'}
                     >
                       <Power className="w-4 h-4" />
+                    </button>
+                    <button
+                      onClick={() => setUnitToDelete(u)}
+                      className="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition"
+                      title="Hapus Unit Kerja"
+                    >
+                      <Trash2 className="w-4 h-4" />
                     </button>
                   </div>
                 </td>
@@ -180,6 +233,15 @@ export const UnitsPage: React.FC<UnitsPageProps> = ({ units }) => {
           </tbody>
         </table>
       </div>
+
+      {/* Confirm Delete Modal */}
+      <ConfirmDeleteModal
+        isOpen={!!unitToDelete}
+        onClose={() => setUnitToDelete(null)}
+        onConfirm={handleConfirmDelete}
+        itemName={unitToDelete?.nama}
+        title="Hapus Unit Kerja"
+      />
 
       {/* Modal */}
       <Modal
