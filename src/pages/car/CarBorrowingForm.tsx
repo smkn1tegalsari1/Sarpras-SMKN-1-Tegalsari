@@ -16,11 +16,9 @@ import {
   User,
   Phone,
   Gauge,
-  Camera,
   AlertTriangle,
   CheckCircle,
   ArrowLeft,
-  Upload,
   Info,
 } from 'lucide-react';
 
@@ -60,12 +58,6 @@ export const CarBorrowingForm: React.FC<CarBorrowingFormProps> = ({
   const [driverHp, setDriverHp] = useState('');
   const [bbmPercent, setBbmPercent] = useState<number>(75);
 
-  // Photos
-  const [fotoDepan, setFotoDepan] = useState<string>('');
-  const [fotoKanan, setFotoKanan] = useState<string>('');
-  const [fotoKiri, setFotoKiri] = useState<string>('');
-  const [fotoBelakang, setFotoBelakang] = useState<string>('');
-
   const [disetujuiOleh, setDisetujuiOleh] = useState(settings.namaPejabat || '');
   const [disetujuiJabatan, setDisetujuiJabatan] = useState(
     settings.jabatanPejabat || 'Waka Sarana & Prasarana'
@@ -73,24 +65,6 @@ export const CarBorrowingForm: React.FC<CarBorrowingFormProps> = ({
 
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
-
-  // Handle Photo File Upload / Camera snapshot to Base64
-  const handlePhotoUpload = (
-    e: React.ChangeEvent<HTMLInputElement>,
-    setter: (val: string) => void
-  ) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    if (file.size > 2 * 1024 * 1024) {
-      alert('Ukuran foto terlalu besar. Maksimal 2MB.');
-      return;
-    }
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      setter(reader.result as string);
-    };
-    reader.readAsDataURL(file);
-  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -176,10 +150,6 @@ export const CarBorrowingForm: React.FC<CarBorrowingFormProps> = ({
         driverNama,
         driverHp,
         bbmPercent: Number(bbmPercent),
-        fotoDepan: fotoDepan || '',
-        fotoKanan: fotoKanan || '',
-        fotoKiri: fotoKiri || '',
-        fotoBelakang: fotoBelakang || '',
         disetujuiOleh,
         disetujuiJabatan,
         catatan:
@@ -488,11 +458,11 @@ export const CarBorrowingForm: React.FC<CarBorrowingFormProps> = ({
             </div>
           </div>
 
-          {/* SECTION 6: KONDISI AWAL & 4 FOTO */}
+          {/* SECTION 6: KONDISI AWAL KENDARAAN */}
           <div className="space-y-4">
             <h3 className="text-sm font-bold uppercase tracking-wider text-slate-800 flex items-center gap-2 pb-2 border-b border-slate-100">
-              <Camera className="w-4 h-4 text-blue-600" />
-              6. Kondisi Awal & Dokumentasi Foto (4 Sisi)
+              <Gauge className="w-4 h-4 text-blue-600" />
+              6. Kondisi Awal Kendaraan
             </h3>
 
             {/* BBM % */}
@@ -512,97 +482,6 @@ export const CarBorrowingForm: React.FC<CarBorrowingFormProps> = ({
                 onChange={(e) => setBbmPercent(Number(e.target.value))}
                 className="w-full accent-blue-600"
               />
-            </div>
-
-            {/* 4 Photos Upload */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2">
-              {/* Depan */}
-              <div className="border border-slate-200 rounded-2xl p-3 bg-slate-50 text-center">
-                <p className="text-[11px] font-bold text-slate-700 mb-2">Foto Depan</p>
-                <div className="h-28 rounded-xl bg-slate-200 flex items-center justify-center overflow-hidden mb-2 relative group">
-                  {fotoDepan ? (
-                    <img src={fotoDepan} alt="Depan" className="w-full h-full object-cover" />
-                  ) : (
-                    <Camera className="w-6 h-6 text-slate-400" />
-                  )}
-                </div>
-                <label className="cursor-pointer inline-flex items-center gap-1 text-[10px] font-bold text-blue-600 hover:text-blue-700">
-                  <Upload className="w-3 h-3" /> Unggah / Kamera
-                  <input
-                    type="file"
-                    accept="image/*"
-                    capture="environment"
-                    className="hidden"
-                    onChange={(e) => handlePhotoUpload(e, setFotoDepan)}
-                  />
-                </label>
-              </div>
-
-              {/* Samping Kanan */}
-              <div className="border border-slate-200 rounded-2xl p-3 bg-slate-50 text-center">
-                <p className="text-[11px] font-bold text-slate-700 mb-2">Foto Kanan</p>
-                <div className="h-28 rounded-xl bg-slate-200 flex items-center justify-center overflow-hidden mb-2 relative group">
-                  {fotoKanan ? (
-                    <img src={fotoKanan} alt="Kanan" className="w-full h-full object-cover" />
-                  ) : (
-                    <Camera className="w-6 h-6 text-slate-400" />
-                  )}
-                </div>
-                <label className="cursor-pointer inline-flex items-center gap-1 text-[10px] font-bold text-blue-600 hover:text-blue-700">
-                  <Upload className="w-3 h-3" /> Unggah / Kamera
-                  <input
-                    type="file"
-                    accept="image/*"
-                    capture="environment"
-                    className="hidden"
-                    onChange={(e) => handlePhotoUpload(e, setFotoKanan)}
-                  />
-                </label>
-              </div>
-
-              {/* Samping Kiri */}
-              <div className="border border-slate-200 rounded-2xl p-3 bg-slate-50 text-center">
-                <p className="text-[11px] font-bold text-slate-700 mb-2">Foto Kiri</p>
-                <div className="h-28 rounded-xl bg-slate-200 flex items-center justify-center overflow-hidden mb-2 relative group">
-                  {fotoKiri ? (
-                    <img src={fotoKiri} alt="Kiri" className="w-full h-full object-cover" />
-                  ) : (
-                    <Camera className="w-6 h-6 text-slate-400" />
-                  )}
-                </div>
-                <label className="cursor-pointer inline-flex items-center gap-1 text-[10px] font-bold text-blue-600 hover:text-blue-700">
-                  <Upload className="w-3 h-3" /> Unggah / Kamera
-                  <input
-                    type="file"
-                    accept="image/*"
-                    capture="environment"
-                    className="hidden"
-                    onChange={(e) => handlePhotoUpload(e, setFotoKiri)}
-                  />
-                </label>
-              </div>
-
-              {/* Belakang */}
-              <div className="border border-slate-200 rounded-2xl p-3 bg-slate-50 text-center">
-                <p className="text-[11px] font-bold text-slate-700 mb-2">Foto Belakang</p>
-                <div className="h-28 rounded-xl bg-slate-200 flex items-center justify-center overflow-hidden mb-2 relative group">
-                  {fotoBelakang ? (
-                    <img src={fotoBelakang} alt="Belakang" className="w-full h-full object-cover" />
-                  ) : (
-                    <Camera className="w-6 h-6 text-slate-400" />
-                  )}
-                </div>
-                <label className="cursor-pointer inline-flex items-center gap-1 text-[10px] font-bold text-blue-600 hover:text-blue-700">
-                  <Upload className="w-3 h-3" /> Unggah / Kamera
-                  <input
-                    type="file"
-                    accept="image/*"
-                    capture="environment"
-                    className="hidden"
-                    onChange={(e) => handlePhotoUpload(e, setFotoBelakang)}
-                  />
-                </label>
-              </div>
             </div>
           </div>
 

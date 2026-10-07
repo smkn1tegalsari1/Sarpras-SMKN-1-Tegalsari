@@ -154,57 +154,59 @@ export const PrintCarDoc: React.FC<PrintCarDocProps> = ({ data, settings, onClos
           </tbody>
         </table>
 
-        {/* 4 Photos Condition */}
-        <div className="mb-5">
-          <p className="font-bold text-xs uppercase mb-2 text-slate-800">
-            III. Pemeriksaan Kondisi Fisik Kendaraan (4 Sisi)
-          </p>
-          <div className="grid grid-cols-4 gap-2 text-center text-[10px] font-sans">
-            <div className="border border-slate-400 p-1.5 rounded bg-slate-50">
-              <div className="h-28 bg-slate-200 flex items-center justify-center overflow-hidden rounded mb-1">
-                {data.fotoDepan ? (
-                  <img src={data.fotoDepan} alt="Foto Depan" className="w-full h-full object-cover" />
-                ) : (
-                  <span className="text-slate-400 italic">Foto Depan</span>
-                )}
+        {/* Photos Condition (Only rendered if photos were provided) */}
+        {(data.fotoDepan || data.fotoKanan || data.fotoKiri || data.fotoBelakang) && (
+          <div className="mb-5">
+            <p className="font-bold text-xs uppercase mb-2 text-slate-800">
+              III. Pemeriksaan Kondisi Fisik Kendaraan (4 Sisi)
+            </p>
+            <div className="grid grid-cols-4 gap-2 text-center text-[10px] font-sans">
+              <div className="border border-slate-400 p-1.5 rounded bg-slate-50">
+                <div className="h-28 bg-slate-200 flex items-center justify-center overflow-hidden rounded mb-1">
+                  {data.fotoDepan ? (
+                    <img src={data.fotoDepan} alt="Foto Depan" className="w-full h-full object-cover" />
+                  ) : (
+                    <span className="text-slate-400 italic">Foto Depan</span>
+                  )}
+                </div>
+                <span className="font-semibold">Foto Depan</span>
               </div>
-              <span className="font-semibold">Foto Depan</span>
-            </div>
 
-            <div className="border border-slate-400 p-1.5 rounded bg-slate-50">
-              <div className="h-28 bg-slate-200 flex items-center justify-center overflow-hidden rounded mb-1">
-                {data.fotoKanan ? (
-                  <img src={data.fotoKanan} alt="Foto Kanan" className="w-full h-full object-cover" />
-                ) : (
-                  <span className="text-slate-400 italic">Samping Kanan</span>
-                )}
+              <div className="border border-slate-400 p-1.5 rounded bg-slate-50">
+                <div className="h-28 bg-slate-200 flex items-center justify-center overflow-hidden rounded mb-1">
+                  {data.fotoKanan ? (
+                    <img src={data.fotoKanan} alt="Foto Kanan" className="w-full h-full object-cover" />
+                  ) : (
+                    <span className="text-slate-400 italic">Samping Kanan</span>
+                  )}
+                </div>
+                <span className="font-semibold">Foto Samping Kanan</span>
               </div>
-              <span className="font-semibold">Foto Samping Kanan</span>
-            </div>
 
-            <div className="border border-slate-400 p-1.5 rounded bg-slate-50">
-              <div className="h-28 bg-slate-200 flex items-center justify-center overflow-hidden rounded mb-1">
-                {data.fotoKiri ? (
-                  <img src={data.fotoKiri} alt="Foto Kiri" className="w-full h-full object-cover" />
-                ) : (
-                  <span className="text-slate-400 italic">Samping Kiri</span>
-                )}
+              <div className="border border-slate-400 p-1.5 rounded bg-slate-50">
+                <div className="h-28 bg-slate-200 flex items-center justify-center overflow-hidden rounded mb-1">
+                  {data.fotoKiri ? (
+                    <img src={data.fotoKiri} alt="Foto Kiri" className="w-full h-full object-cover" />
+                  ) : (
+                    <span className="text-slate-400 italic">Samping Kiri</span>
+                  )}
+                </div>
+                <span className="font-semibold">Foto Samping Kiri</span>
               </div>
-              <span className="font-semibold">Foto Samping Kiri</span>
-            </div>
 
-            <div className="border border-slate-400 p-1.5 rounded bg-slate-50">
-              <div className="h-28 bg-slate-200 flex items-center justify-center overflow-hidden rounded mb-1">
-                {data.fotoBelakang ? (
-                  <img src={data.fotoBelakang} alt="Foto Belakang" className="w-full h-full object-cover" />
-                ) : (
-                  <span className="text-slate-400 italic">Foto Belakang</span>
-                )}
+              <div className="border border-slate-400 p-1.5 rounded bg-slate-50">
+                <div className="h-28 bg-slate-200 flex items-center justify-center overflow-hidden rounded mb-1">
+                  {data.fotoBelakang ? (
+                    <img src={data.fotoBelakang} alt="Foto Belakang" className="w-full h-full object-cover" />
+                  ) : (
+                    <span className="text-slate-400 italic">Foto Belakang</span>
+                  )}
+                </div>
+                <span className="font-semibold">Foto Belakang</span>
               </div>
-              <span className="font-semibold">Foto Belakang</span>
             </div>
           </div>
-        </div>
+        )}
 
         {/* Catatan Ketentuan */}
         <div className="border border-slate-300 p-2 text-[11px] font-sans italic bg-slate-50 mb-6 text-slate-700">

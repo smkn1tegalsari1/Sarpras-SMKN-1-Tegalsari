@@ -129,13 +129,22 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }
       } else {
         setCurrentUser(null);
-        // Default to active demo admin for immediate access
-        const savedDemo = localStorage.getItem('sisarpras_demo_role') as UserRole;
-        if (savedDemo && DEMO_PROFILES[savedDemo]) {
-          setUserProfile(DEMO_PROFILES[savedDemo]);
-        } else {
-          setUserProfile(DEMO_PROFILES.admin);
+        // Check for authenticated session via username/password
+        const savedUserJson = localStorage.getItem('sisarpras_user_session');
+        if (savedUserJson) {
+          try {
+            const parsed = JSON.parse(savedUserJson) as UserProfile;
+            if (parsed && parsed.role) {
+              setUserProfile(parsed);
+              setLoading(false);
+              return;
+            }
+          } catch (e) {
+            console.error('Session parse error:', e);
+          }
         }
+        // If not logged in, remain unauthenticated so login page is displayed
+        setUserProfile(null);
       }
       setLoading(false);
     });
@@ -171,11 +180,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           throw new Error('Password salah. Silakan periksa kembali atau hubungi Administrator.');
         }
         setUserProfile(matchedDoc);
-        localStorage.setItem('sisarpras_demo_role', matchedDoc.role);
+        localStorage.setItem('sisarpras_user_session', JSON.stringify(matchedDoc));
         return;
       }
 
-      // 2. Check built-in demo profiles
+      // 2. Check built-in initial accounts
       const demoRoles: UserRole[] = ['admin', 'sarpras', 'pemohon'];
       for (const r of demoRoles) {
         const p = DEMO_PROFILES[r];
@@ -187,7 +196,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             throw new Error('Password salah. Silakan periksa kembali.');
           }
           setUserProfile(p);
-          localStorage.setItem('sisarpras_demo_role', r);
+          localStorage.setItem('sisarpras_user_session', JSON.stringify(p));
           return;
         }
       }
@@ -273,7 +282,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         updatedAt: new Date().toISOString(),
       };
       setUserProfile(newProfile);
-      localStorage.setItem('sisarpras_demo_role', role);
+      localStorage.setItem('sisarpras_user_session', JSON.stringify(newProfile));
     } finally {
       setLoading(false);
     }
@@ -287,12 +296,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
     setCurrentUser(null);
     setUserProfile(null);
+    localStorage.removeItem('sisarpras_user_session');
     localStorage.removeItem('sisarpras_demo_role');
   };
 
-  const switchDemoRole = async (targetRole: UserRole) => {
-    localStorage.setItem('sisarpras_demo_role', targetRole);
-    setUserProfile(DEMO_PROFILES[targetRole]);
+  const switchDemoRole = async (_targetRole: UserRole) => {
+    // Role switching disabled to enforce strict authentication by role
   };
 
   const updateProfileData = async (data: Partial<UserProfile>) => {
@@ -303,6 +312,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       updatedAt: new Date().toISOString(),
     };
     setUserProfile(updated);
+    localStorage.setItem('sisarpras_user_session', JSON.stringify(updated));
     try {
       if (currentUser?.uid) {
         await setDoc(doc(db, 'users', currentUser.uid), updated, { merge: true });
@@ -312,7 +322,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  const currentRole: UserRole = userProfile?.role || 'admin';
+  const currentRole: UserRole = userProfile?.role || 'pemohon';
 
   return (
     <AuthContext.Provider

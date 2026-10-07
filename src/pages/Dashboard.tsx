@@ -437,7 +437,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
           {/* Breakdown pills */}
           <div className="mt-5 grid grid-cols-3 gap-2 sm:gap-2.5">
             <div
-              onClick={() => onNavigate('inv_vehicles')}
+              onClick={() => onNavigate(isPemohon ? 'sarpras_calendar' : 'vehicles')}
               className="p-3 rounded-2xl bg-slate-50 hover:bg-slate-100/80 border border-slate-200/70 cursor-pointer transition text-left"
             >
               <div className="flex items-center justify-between text-slate-700 mb-1">
@@ -449,7 +449,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
             </div>
 
             <div
-              onClick={() => onNavigate('inv_rooms')}
+              onClick={() => onNavigate(isPemohon ? 'sarpras_calendar' : 'rooms')}
               className="p-3 rounded-2xl bg-slate-50 hover:bg-slate-100/80 border border-slate-200/70 cursor-pointer transition text-left"
             >
               <div className="flex items-center justify-between text-slate-700 mb-1">
@@ -461,7 +461,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
             </div>
 
             <div
-              onClick={() => onNavigate('inv_facilities')}
+              onClick={() => onNavigate(isPemohon ? 'sarpras_calendar' : 'facilities')}
               className="p-3 rounded-2xl bg-slate-50 hover:bg-slate-100/80 border border-slate-200/70 cursor-pointer transition text-left"
             >
               <div className="flex items-center justify-between text-slate-700 mb-1">
@@ -480,10 +480,10 @@ export const Dashboard: React.FC<DashboardProps> = ({
               Kondisi fisik aset sarpras terawat dan siap pakai.
             </span>
             <button
-              onClick={() => onNavigate('inv_facilities')}
+              onClick={() => onNavigate(isPemohon ? 'sarpras_calendar' : 'facilities')}
               className="font-bold text-emerald-600 hover:text-emerald-800 flex items-center gap-1 hover:underline shrink-0"
             >
-              Data Inventaris <ArrowRight className="w-3.5 h-3.5" />
+              {isPemohon ? 'Cek Kalender Ketersediaan' : 'Data Inventaris'} <ArrowRight className="w-3.5 h-3.5" />
             </button>
           </div>
         </div>

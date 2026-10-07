@@ -5,12 +5,10 @@ import {
   Bell,
   Menu,
   ShieldCheck,
-  User,
   LogOut,
   Building2,
   CheckCircle2,
   Clock,
-  Sparkles,
 } from 'lucide-react';
 
 interface HeaderProps {
@@ -27,7 +25,7 @@ export const Header: React.FC<HeaderProps> = ({
   onOpenMobileMenu,
   setActiveTab,
 }) => {
-  const { userProfile, role, switchDemoRole, logout } = useAuth();
+  const { userProfile, role, logout } = useAuth();
   const [showNotifications, setShowNotifications] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
 
@@ -72,35 +70,14 @@ export const Header: React.FC<HeaderProps> = ({
           </div>
         </div>
 
-        {/* Right Side: Role Selector & Actions */}
+        {/* Right Side: Role Badge & Actions */}
         <div className="flex items-center gap-2 sm:gap-4">
-          {/* Quick Role Tester for Evaluator / Multi-Role Switching */}
-          <div className="hidden md:flex items-center bg-slate-100 p-1 rounded-xl border border-slate-200 text-xs">
-            <span className="px-2 font-medium text-slate-500 flex items-center gap-1 text-[11px]">
-              <Sparkles className="w-3.5 h-3.5 text-blue-600" />
-              Role:
-            </span>
-            {(['admin', 'sarpras', 'pemohon'] as UserRole[]).map((r) => (
-              <button
-                key={r}
-                onClick={() => switchDemoRole(r)}
-                className={`px-2.5 py-1 rounded-lg font-medium transition text-xs capitalize ${
-                  role === r
-                    ? 'bg-white text-blue-700 shadow-xs font-semibold'
-                    : 'text-slate-600 hover:text-slate-900'
-                }`}
-              >
-                {r === 'sarpras' ? 'Sarpras' : r}
-              </button>
-            ))}
-          </div>
-
           {/* Active Role Tag */}
           <span
-            className={`hidden sm:inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-bold border ${roleLabelMap[role].color}`}
+            className={`inline-flex items-center px-3 py-1.5 rounded-xl text-xs font-bold border ${roleLabelMap[role]?.color || 'bg-slate-100 text-slate-700 border-slate-200'}`}
           >
-            <ShieldCheck className="w-3.5 h-3.5 mr-1" />
-            {roleLabelMap[role].label}
+            <ShieldCheck className="w-3.5 h-3.5 mr-1.5 shrink-0" />
+            {roleLabelMap[role]?.label || role.toUpperCase()}
           </span>
 
           {/* Notification Bell */}
@@ -191,29 +168,12 @@ export const Header: React.FC<HeaderProps> = ({
                   <div className="mt-2 inline-block px-2 py-0.5 rounded text-[10px] font-semibold bg-blue-50 text-blue-700">
                     Unit: {userProfile?.unitNama || 'Umum'}
                   </div>
+                  <div className="mt-1 block text-[10px] font-semibold text-slate-500 uppercase">
+                    Role: {roleLabelMap[role]?.label || role}
+                  </div>
                 </div>
 
                 <div className="p-1">
-                  <div className="md:hidden py-2 px-3 border-b border-slate-100">
-                    <p className="text-[11px] font-semibold text-slate-400 uppercase mb-1">Ganti Role Demo</p>
-                    <div className="flex gap-1">
-                      {(['admin', 'sarpras', 'pemohon'] as UserRole[]).map((r) => (
-                        <button
-                          key={r}
-                          onClick={() => {
-                            switchDemoRole(r);
-                            setShowUserMenu(false);
-                          }}
-                          className={`flex-1 py-1 text-xs rounded font-medium capitalize ${
-                            role === r ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-600'
-                          }`}
-                        >
-                          {r}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-
                   <button
                     onClick={() => {
                       logout();

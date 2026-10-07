@@ -1,16 +1,14 @@
 import React, { useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
-import { SchoolSettings, UserRole } from '../../types';
+import { SchoolSettings } from '../../types';
 import {
   Building2,
   Lock,
   User,
   ArrowRight,
   AlertCircle,
-  Sparkles,
   Eye,
   EyeOff,
-  KeyRound,
 } from 'lucide-react';
 
 interface LoginPageProps {
@@ -19,7 +17,7 @@ interface LoginPageProps {
 }
 
 export const LoginPage: React.FC<LoginPageProps> = ({ settings, onSuccess }) => {
-  const { loginWithUsername, loginWithGoogle, switchDemoRole } = useAuth();
+  const { loginWithUsername } = useAuth();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -43,24 +41,6 @@ export const LoginPage: React.FC<LoginPageProps> = ({ settings, onSuccess }) => 
     } finally {
       setIsLoading(false);
     }
-  };
-
-  const handleGoogleLogin = async () => {
-    setIsLoading(true);
-    setErrorMsg(null);
-    try {
-      await loginWithGoogle();
-      onSuccess();
-    } catch (err: any) {
-      setErrorMsg('Gagal masuk dengan Google.');
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleQuickDemo = async (role: UserRole) => {
-    await switchDemoRole(role);
-    onSuccess();
   };
 
   return (
@@ -117,7 +97,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ settings, onSuccess }) => 
                     required
                     value={username}
                     onChange={(e) => setUsername(e.target.value)}
-                    placeholder="Contoh: admin / sarpras / guru"
+                    placeholder="Masukkan username Anda"
                     className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-300 text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent transition"
                   />
                 </div>
@@ -139,13 +119,13 @@ export const LoginPage: React.FC<LoginPageProps> = ({ settings, onSuccess }) => 
                     required
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    placeholder="••••••••"
+                    placeholder="Masukkan password Anda"
                     className="w-full pl-10 pr-10 py-2.5 rounded-xl border border-slate-300 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent transition"
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-2.5 text-slate-400 hover:text-slate-600 transition"
+                    className="absolute right-3 top-2.5 text-slate-400 hover:text-slate-600 transition cursor-pointer"
                   >
                     {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                   </button>
@@ -155,7 +135,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ settings, onSuccess }) => 
               <button
                 type="submit"
                 disabled={isLoading}
-                className="w-full mt-2 py-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow-md shadow-blue-500/20 transition flex items-center justify-center gap-2 disabled:opacity-50"
+                className="w-full mt-2 py-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow-md shadow-blue-500/20 transition flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer"
               >
                 {isLoading ? (
                   'Memverifikasi Akun...'
@@ -166,77 +146,6 @@ export const LoginPage: React.FC<LoginPageProps> = ({ settings, onSuccess }) => 
                 )}
               </button>
             </form>
-
-            {/* Default Account Credentials Hint */}
-            <div className="mt-5 p-3 rounded-2xl bg-slate-50 border border-slate-200 text-[11px] space-y-1.5">
-              <p className="font-bold text-slate-700 flex items-center gap-1">
-                <KeyRound className="w-3.5 h-3.5 text-blue-600" />
-                Akun Bawaan Sistem:
-              </p>
-              <div className="grid grid-cols-3 gap-1 text-[10px] font-mono text-slate-600">
-                <div
-                  onClick={() => {
-                    setUsername('admin');
-                    setPassword('admin123');
-                  }}
-                  className="p-1.5 bg-white rounded-lg border border-slate-200 cursor-pointer hover:border-blue-400 transition text-center"
-                >
-                  <strong className="block text-purple-700 font-sans">Admin</strong>
-                  admin / admin123
-                </div>
-                <div
-                  onClick={() => {
-                    setUsername('sarpras');
-                    setPassword('sarpras123');
-                  }}
-                  className="p-1.5 bg-white rounded-lg border border-slate-200 cursor-pointer hover:border-blue-400 transition text-center"
-                >
-                  <strong className="block text-blue-700 font-sans">Sarpras</strong>
-                  sarpras / sarpras123
-                </div>
-                <div
-                  onClick={() => {
-                    setUsername('guru');
-                    setPassword('guru123');
-                  }}
-                  className="p-1.5 bg-white rounded-lg border border-slate-200 cursor-pointer hover:border-blue-400 transition text-center"
-                >
-                  <strong className="block text-emerald-700 font-sans">Pemohon</strong>
-                  guru / guru123
-                </div>
-              </div>
-            </div>
-
-            {/* Quick Demo Access Buttons for Evaluator */}
-            <div className="mt-5 pt-4 border-t border-slate-100">
-              <p className="text-[11px] font-bold text-slate-500 uppercase tracking-wider text-center mb-2 flex items-center justify-center gap-1">
-                <Sparkles className="w-3.5 h-3.5 text-blue-600" />
-                Masuk Cepat 1-Klik:
-              </p>
-              <div className="grid grid-cols-3 gap-2">
-                <button
-                  type="button"
-                  onClick={() => handleQuickDemo('admin')}
-                  className="p-2 rounded-xl bg-purple-50 hover:bg-purple-100 text-purple-700 font-bold text-[11px] border border-purple-200 transition text-center"
-                >
-                  Admin
-                </button>
-                <button
-                  type="button"
-                  onClick={() => handleQuickDemo('sarpras')}
-                  className="p-2 rounded-xl bg-blue-50 hover:bg-blue-100 text-blue-700 font-bold text-[11px] border border-blue-200 transition text-center"
-                >
-                  Sarpras
-                </button>
-                <button
-                  type="button"
-                  onClick={() => handleQuickDemo('pemohon')}
-                  className="p-2 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-bold text-[11px] border border-emerald-200 transition text-center"
-                >
-                  Pemohon
-                </button>
-              </div>
-            </div>
           </div>
         </div>
 

@@ -34,6 +34,7 @@ import {
   Facility,
   UnitKerja,
   UserProfile,
+  UserRole,
   AppNotification,
   SchoolSettings,
   ApplicationStatus,
@@ -58,12 +59,70 @@ import {
 import { doc, updateDoc } from 'firebase/firestore';
 import { db, handleFirestoreError, OperationType } from './lib/firebase';
 
+const ALLOWED_TABS_BY_ROLE: Record<UserRole, string[]> = {
+  admin: [
+    'dashboard',
+    'car_list',
+    'car_new',
+    'hall_list',
+    'hall_new',
+    'equipment_list',
+    'equipment_new',
+    'sarpras_calendar',
+    'vehicles',
+    'rooms',
+    'facilities',
+    'report_cars',
+    'report_halls',
+    'report_equipment',
+    'report_rekap',
+    'users',
+    'units',
+    'settings',
+  ],
+  sarpras: [
+    'dashboard',
+    'car_list',
+    'car_new',
+    'hall_list',
+    'hall_new',
+    'equipment_list',
+    'equipment_new',
+    'sarpras_calendar',
+    'vehicles',
+    'rooms',
+    'facilities',
+    'report_cars',
+    'report_halls',
+    'report_equipment',
+    'report_rekap',
+  ],
+  pemohon: [
+    'dashboard',
+    'car_list',
+    'car_new',
+    'hall_list',
+    'hall_new',
+    'equipment_list',
+    'equipment_new',
+    'sarpras_calendar',
+  ],
+};
+
 const AppContent: React.FC = () => {
   const { userProfile, role, loading } = useAuth();
 
   // Navigation tab state
   const [activeTab, setActiveTab] = useState('dashboard');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  // Enforce strict role-based tab access
+  useEffect(() => {
+    const allowed = ALLOWED_TABS_BY_ROLE[role] || ['dashboard'];
+    if (!allowed.includes(activeTab)) {
+      setActiveTab('dashboard');
+    }
+  }, [role, activeTab]);
 
   // Real-time Firestore state
   const [settings, setSettings] = useState<SchoolSettings>(DEFAULT_SETTINGS);
@@ -416,74 +475,85 @@ const AppContent: React.FC = () => {
             />
           )}
 
-          {activeTab === 'vehicles' && <VehiclesPage vehicles={vehicles} />}
-
-          {activeTab === 'rooms' && <RoomsPage rooms={rooms} />}
-
-          {activeTab === 'facilities' && <FacilitiesPage facilities={facilities} />}
-
-          {activeTab === 'report_cars' && (
-            <ReportsPage
-              carBorrowings={carBorrowings}
-              hallBookings={hallBookings}
-              equipmentBorrowings={equipmentBorrowings}
-              vehicles={vehicles}
-              rooms={rooms}
-              facilities={facilities}
-              units={units}
-              settings={settings}
-              defaultMode="CARS"
-            />
+          {/* SARANA & PRASARANA (Hanya Admin & Sarpras) */}
+          {(role === 'admin' || role === 'sarpras') && (
+            <>
+              {activeTab === 'vehicles' && <VehiclesPage vehicles={vehicles} />}
+              {activeTab === 'rooms' && <RoomsPage rooms={rooms} />}
+              {activeTab === 'facilities' && <FacilitiesPage facilities={facilities} />}
+            </>
           )}
 
-          {activeTab === 'report_halls' && (
-            <ReportsPage
-              carBorrowings={carBorrowings}
-              hallBookings={hallBookings}
-              equipmentBorrowings={equipmentBorrowings}
-              vehicles={vehicles}
-              rooms={rooms}
-              facilities={facilities}
-              units={units}
-              settings={settings}
-              defaultMode="HALLS"
-            />
+          {/* LAPORAN (Hanya Admin & Sarpras) */}
+          {(role === 'admin' || role === 'sarpras') && (
+            <>
+              {activeTab === 'report_cars' && (
+                <ReportsPage
+                  carBorrowings={carBorrowings}
+                  hallBookings={hallBookings}
+                  equipmentBorrowings={equipmentBorrowings}
+                  vehicles={vehicles}
+                  rooms={rooms}
+                  facilities={facilities}
+                  units={units}
+                  settings={settings}
+                  defaultMode="CARS"
+                />
+              )}
+
+              {activeTab === 'report_halls' && (
+                <ReportsPage
+                  carBorrowings={carBorrowings}
+                  hallBookings={hallBookings}
+                  equipmentBorrowings={equipmentBorrowings}
+                  vehicles={vehicles}
+                  rooms={rooms}
+                  facilities={facilities}
+                  units={units}
+                  settings={settings}
+                  defaultMode="HALLS"
+                />
+              )}
+
+              {activeTab === 'report_equipment' && (
+                <ReportsPage
+                  carBorrowings={carBorrowings}
+                  hallBookings={hallBookings}
+                  equipmentBorrowings={equipmentBorrowings}
+                  vehicles={vehicles}
+                  rooms={rooms}
+                  facilities={facilities}
+                  units={units}
+                  settings={settings}
+                  defaultMode="EQUIPMENT"
+                />
+              )}
+
+              {activeTab === 'report_rekap' && (
+                <ReportsPage
+                  carBorrowings={carBorrowings}
+                  hallBookings={hallBookings}
+                  equipmentBorrowings={equipmentBorrowings}
+                  vehicles={vehicles}
+                  rooms={rooms}
+                  facilities={facilities}
+                  units={units}
+                  settings={settings}
+                  defaultMode="REKAP"
+                />
+              )}
+            </>
           )}
 
-          {activeTab === 'report_equipment' && (
-            <ReportsPage
-              carBorrowings={carBorrowings}
-              hallBookings={hallBookings}
-              equipmentBorrowings={equipmentBorrowings}
-              vehicles={vehicles}
-              rooms={rooms}
-              facilities={facilities}
-              units={units}
-              settings={settings}
-              defaultMode="EQUIPMENT"
-            />
-          )}
-
-          {activeTab === 'report_rekap' && (
-            <ReportsPage
-              carBorrowings={carBorrowings}
-              hallBookings={hallBookings}
-              equipmentBorrowings={equipmentBorrowings}
-              vehicles={vehicles}
-              rooms={rooms}
-              facilities={facilities}
-              units={units}
-              settings={settings}
-              defaultMode="REKAP"
-            />
-          )}
-
-          {activeTab === 'users' && <UsersPage users={users} units={units} />}
-
-          {activeTab === 'units' && <UnitsPage units={units} />}
-
-          {activeTab === 'settings' && (
-            <SettingsPage settings={settings} onUpdated={(s) => setSettings(s)} />
+          {/* ADMINISTRASI (Hanya Admin) */}
+          {role === 'admin' && (
+            <>
+              {activeTab === 'users' && <UsersPage users={users} units={units} />}
+              {activeTab === 'units' && <UnitsPage units={units} />}
+              {activeTab === 'settings' && (
+                <SettingsPage settings={settings} onUpdated={(s) => setSettings(s)} />
+              )}
+            </>
           )}
         </main>
       </div>

@@ -174,57 +174,59 @@ export const CarDetailModal: React.FC<CarDetailModalProps> = ({
         </div>
       </div>
 
-      {/* 4 Photos Condition */}
-      <div className="p-4 rounded-2xl border border-slate-200 bg-white space-y-3">
-        <h4 className="font-bold text-slate-800 text-sm flex items-center gap-2">
-          <Camera className="w-4 h-4 text-blue-600" /> Dokumentasi Kondisi Fisik (4 Sisi)
-        </h4>
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-          <div className="border border-slate-200 rounded-xl p-2 text-center bg-slate-50">
-            <span className="text-[10px] font-bold text-slate-600 mb-1 block">Foto Depan</span>
-            <div className="h-28 bg-slate-200 rounded-lg overflow-hidden flex items-center justify-center">
-              {data.fotoDepan ? (
-                <img src={data.fotoDepan} alt="Depan" className="w-full h-full object-cover" />
-              ) : (
-                <span className="text-slate-400 text-[10px]">Tidak ada foto</span>
-              )}
+      {/* 4 Photos Condition (Only shown if photos were provided) */}
+      {(data.fotoDepan || data.fotoKanan || data.fotoKiri || data.fotoBelakang) && (
+        <div className="p-4 rounded-2xl border border-slate-200 bg-white space-y-3">
+          <h4 className="font-bold text-slate-800 text-sm flex items-center gap-2">
+            <Camera className="w-4 h-4 text-blue-600" /> Dokumentasi Kondisi Fisik (4 Sisi)
+          </h4>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            <div className="border border-slate-200 rounded-xl p-2 text-center bg-slate-50">
+              <span className="text-[10px] font-bold text-slate-600 mb-1 block">Foto Depan</span>
+              <div className="h-28 bg-slate-200 rounded-lg overflow-hidden flex items-center justify-center">
+                {data.fotoDepan ? (
+                  <img src={data.fotoDepan} alt="Depan" className="w-full h-full object-cover" />
+                ) : (
+                  <span className="text-slate-400 text-[10px]">Tidak ada foto</span>
+                )}
+              </div>
             </div>
-          </div>
 
-          <div className="border border-slate-200 rounded-xl p-2 text-center bg-slate-50">
-            <span className="text-[10px] font-bold text-slate-600 mb-1 block">Samping Kanan</span>
-            <div className="h-28 bg-slate-200 rounded-lg overflow-hidden flex items-center justify-center">
-              {data.fotoKanan ? (
-                <img src={data.fotoKanan} alt="Kanan" className="w-full h-full object-cover" />
-              ) : (
-                <span className="text-slate-400 text-[10px]">Tidak ada foto</span>
-              )}
+            <div className="border border-slate-200 rounded-xl p-2 text-center bg-slate-50">
+              <span className="text-[10px] font-bold text-slate-600 mb-1 block">Samping Kanan</span>
+              <div className="h-28 bg-slate-200 rounded-lg overflow-hidden flex items-center justify-center">
+                {data.fotoKanan ? (
+                  <img src={data.fotoKanan} alt="Kanan" className="w-full h-full object-cover" />
+                ) : (
+                  <span className="text-slate-400 text-[10px]">Tidak ada foto</span>
+                )}
+              </div>
             </div>
-          </div>
 
-          <div className="border border-slate-200 rounded-xl p-2 text-center bg-slate-50">
-            <span className="text-[10px] font-bold text-slate-600 mb-1 block">Samping Kiri</span>
-            <div className="h-28 bg-slate-200 rounded-lg overflow-hidden flex items-center justify-center">
-              {data.fotoKiri ? (
-                <img src={data.fotoKiri} alt="Kiri" className="w-full h-full object-cover" />
-              ) : (
-                <span className="text-slate-400 text-[10px]">Tidak ada foto</span>
-              )}
+            <div className="border border-slate-200 rounded-xl p-2 text-center bg-slate-50">
+              <span className="text-[10px] font-bold text-slate-600 mb-1 block">Samping Kiri</span>
+              <div className="h-28 bg-slate-200 rounded-lg overflow-hidden flex items-center justify-center">
+                {data.fotoKiri ? (
+                  <img src={data.fotoKiri} alt="Kiri" className="w-full h-full object-cover" />
+                ) : (
+                  <span className="text-slate-400 text-[10px]">Tidak ada foto</span>
+                )}
+              </div>
             </div>
-          </div>
 
-          <div className="border border-slate-200 rounded-xl p-2 text-center bg-slate-50">
-            <span className="text-[10px] font-bold text-slate-600 mb-1 block">Foto Belakang</span>
-            <div className="h-28 bg-slate-200 rounded-lg overflow-hidden flex items-center justify-center">
-              {data.fotoBelakang ? (
-                <img src={data.fotoBelakang} alt="Belakang" className="w-full h-full object-cover" />
-              ) : (
-                <span className="text-slate-400 text-[10px]">Tidak ada foto</span>
-              )}
+            <div className="border border-slate-200 rounded-xl p-2 text-center bg-slate-50">
+              <span className="text-[10px] font-bold text-slate-600 mb-1 block">Foto Belakang</span>
+              <div className="h-28 bg-slate-200 rounded-lg overflow-hidden flex items-center justify-center">
+                {data.fotoBelakang ? (
+                  <img src={data.fotoBelakang} alt="Belakang" className="w-full h-full object-cover" />
+                ) : (
+                  <span className="text-slate-400 text-[10px]">Tidak ada foto</span>
+                )}
+              </div>
             </div>
           </div>
         </div>
-      </div>
+      )}
 
       {/* Section 27: Status History Audit Timeline */}
       <div className="p-4 rounded-2xl border border-slate-200 bg-white space-y-3">
