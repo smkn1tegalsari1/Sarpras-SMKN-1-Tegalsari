@@ -59,30 +59,39 @@ export const PrintCarDoc: React.FC<PrintCarDocProps> = ({ data, settings, onClos
 
       {/* Printable Sheet */}
       <div className="printable-document bg-white w-full max-w-[210mm] min-h-[297mm] p-10 shadow-2xl text-slate-900 border font-serif text-sm print:m-0 print:p-8 print:w-full print:shadow-none print:border-none print:max-w-none">
-        {/* Kop Surat */}
+        {/* Kop Surat (Logo Provinsi KIRI & Logo Sekolah KANAN) */}
         <div className="border-b-4 border-double border-slate-900 pb-3 text-center relative mb-5">
+          {settings.logoProvinsiUrl && (
+            <img
+              src={settings.logoProvinsiUrl}
+              alt="Logo Provinsi"
+              className="absolute left-2 top-1 w-20 h-20 object-contain print:block"
+            />
+          )}
           {settings.logoUrl && (
             <img
               src={settings.logoUrl}
               alt="Logo Sekolah"
-              className="absolute left-2 top-1 w-20 h-20 object-contain print:block"
+              className="absolute right-2 top-1 w-20 h-20 object-contain print:block"
             />
           )}
-          <h4 className="text-xs font-bold uppercase tracking-wider text-slate-800">
-            {settings.instansi || 'PEMERINTAH PROVINSI JAWA TIMUR'}
-          </h4>
-          <h4 className="text-xs font-bold uppercase tracking-wider text-slate-800">
-            {settings.dinas || 'DINAS PENDIDIKAN'}
-          </h4>
-          <h2 className="text-xl font-extrabold uppercase tracking-wide text-slate-950 mt-0.5">
-            {settings.namaSekolah || 'SMK NEGERI 1 TEGALSARI'}
-          </h2>
-          <p className="text-[11px] font-sans text-slate-600 mt-1">
-            {settings.alamat}
-          </p>
-          <p className="text-[11px] font-sans text-slate-600">
-            Telp: {settings.telepon} | Email: {settings.email} | Web: {settings.website || 'smkn1tegalsari.sch.id'}
-          </p>
+          <div className="px-24">
+            <h4 className="text-xs font-bold uppercase tracking-wider text-slate-800">
+              {settings.instansi || 'PEMERINTAH PROVINSI JAWA TIMUR'}
+            </h4>
+            <h4 className="text-xs font-bold uppercase tracking-wider text-slate-800">
+              {settings.dinas || 'DINAS PENDIDIKAN'}
+            </h4>
+            <h2 className="text-xl font-extrabold uppercase tracking-wide text-slate-950 mt-0.5">
+              {settings.namaSekolah || 'SMK NEGERI 1 TEGALSARI'}
+            </h2>
+            <p className="text-[11px] font-sans text-slate-600 mt-1">
+              {settings.alamat}
+            </p>
+            <p className="text-[11px] font-sans text-slate-600">
+              Telp: {settings.telepon} | Email: {settings.email} | Web: {settings.website || 'smkn1tegalsari.sch.id'}
+            </p>
+          </div>
         </div>
 
         {/* Title */}
@@ -235,7 +244,7 @@ export const PrintCarDoc: React.FC<PrintCarDocProps> = ({ data, settings, onClos
 
           <div>
             <p className="text-slate-600">
-              Tegalsari, {new Date(data.createdAt).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}
+              Banyuwangi, {new Date(data.createdAt).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}
             </p>
             <p className="font-bold text-slate-900 mt-0.5">Pemohon Peminjaman</p>
             <div className="h-20 flex items-center justify-center">

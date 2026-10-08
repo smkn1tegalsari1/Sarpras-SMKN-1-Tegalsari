@@ -40,10 +40,15 @@ export const DEFAULT_SETTINGS: SchoolSettings = {
   email: 'smkn1tegalsari@yahoo.co.id',
   website: 'smkn1tegalsari.sch.id',
   logoUrl: '',
+  logoProvinsiUrl: '',
   namaPejabat: 'Drs. H. Bambang Wijanarko, M.Pd.',
   jabatanPejabat: 'Kepala SMK Negeri 1 Tegalsari',
   nipPejabat: '19680512 199303 1 008',
   tandaTanganUrl: '',
+  namaPengelola: 'Moch. Nurul Huda, S.Pd.',
+  jabatanPengelola: 'Pengelola Sarana & Prasarana',
+  nipPengelola: '19850314 201101 1 012',
+  tandaTanganPengelolaUrl: '',
 };
 
 // ==========================================

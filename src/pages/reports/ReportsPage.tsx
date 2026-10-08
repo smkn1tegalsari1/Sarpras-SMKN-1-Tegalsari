@@ -328,27 +328,44 @@ export const ReportsPage: React.FC<ReportsPageProps> = ({
 
       {/* Printable Report Document (Visible in browser & fully styled for print) */}
       <div className="bg-white rounded-3xl border border-slate-200 shadow-sm p-6 sm:p-10 font-sans print:m-0 print:p-6 print:border-none print:shadow-none">
-        {/* Kop Surat Resmi */}
+        {/* Kop Surat Resmi (Logo Provinsi KIRI & Logo Sekolah KANAN) */}
         <div className="border-b-4 border-double border-slate-900 pb-3 text-center relative mb-6 font-serif">
+          {/* Logo Provinsi di sebelah KIRI */}
+          {settings.logoProvinsiUrl && (
+            <img
+              src={settings.logoProvinsiUrl}
+              alt="Logo Provinsi"
+              className="absolute left-2 top-0 w-16 h-16 sm:w-20 sm:h-20 object-contain print:block"
+            />
+          )}
+
+          {/* Logo Sekolah di sebelah KANAN */}
           {settings.logoUrl && (
             <img
               src={settings.logoUrl}
-              alt="Logo"
-              className="absolute left-2 top-0 w-16 h-16 object-contain"
+              alt="Logo Sekolah"
+              className="absolute right-2 top-0 w-16 h-16 sm:w-20 sm:h-20 object-contain print:block"
             />
           )}
-          <h4 className="text-xs font-bold uppercase tracking-wider text-slate-800">
-            {settings.instansi || 'PEMERINTAH PROVINSI JAWA TIMUR'}
-          </h4>
-          <h4 className="text-xs font-bold uppercase tracking-wider text-slate-800">
-            {settings.dinas || 'DINAS PENDIDIKAN'}
-          </h4>
-          <h2 className="text-lg font-extrabold uppercase tracking-wide text-slate-950 mt-0.5">
-            {settings.namaSekolah || 'SMK NEGERI 1 TEGALSARI'}
-          </h2>
-          <p className="text-[10px] text-slate-600 mt-0.5">
-            {settings.alamat} | Telp: {settings.telepon}
-          </p>
+
+          {/* Teks Lembaga di Tengah */}
+          <div className="px-16 sm:px-24">
+            <h4 className="text-xs font-bold uppercase tracking-wider text-slate-800">
+              {settings.instansi || 'PEMERINTAH PROVINSI JAWA TIMUR'}
+            </h4>
+            <h4 className="text-xs font-bold uppercase tracking-wider text-slate-800">
+              {settings.dinas || 'DINAS PENDIDIKAN'}
+            </h4>
+            <h2 className="text-lg sm:text-xl font-extrabold uppercase tracking-wide text-slate-950 mt-0.5">
+              {settings.namaSekolah || 'SMK NEGERI 1 TEGALSARI'}
+            </h2>
+            <p className="text-[10px] sm:text-xs text-slate-600 mt-0.5 font-sans">
+              {settings.alamat}
+            </p>
+            <p className="text-[10px] sm:text-xs text-slate-600 font-sans">
+              Telp: {settings.telepon} | Email: {settings.email} | Web: {settings.website || 'smkn1tegalsari.sch.id'}
+            </p>
+          </div>
         </div>
 
         {/* Title */}
@@ -571,36 +588,52 @@ export const ReportsPage: React.FC<ReportsPageProps> = ({
           </div>
         )}
 
-        {/* Tanda Tangan Pengesahan Laporan */}
+        {/* Tanda Tangan Pengesahan Laporan (Kepala Sekolah/Waka berdampingan dengan Pengelola Sarpras) */}
         <div className="mt-12 pt-6 grid grid-cols-2 text-center text-xs font-serif">
+          {/* Pejabat 1: Kepala Sekolah / Waka Sarpras */}
           <div>
             <p className="text-slate-600">Mengetahui,</p>
             <p className="font-bold text-slate-900 mt-0.5">
               {settings.jabatanPejabat || 'Kepala SMK Negeri 1 Tegalsari'}
             </p>
             <div className="h-20 flex items-center justify-center">
-              {settings.tandaTanganUrl && (
-                <img src={settings.tandaTanganUrl} alt="TTD" className="h-16 object-contain" />
+              {settings.tandaTanganUrl ? (
+                <img src={settings.tandaTanganUrl} alt="TTD Pejabat" className="h-16 object-contain" />
+              ) : (
+                <span className="text-[10px] text-slate-300 italic">(Tanda Tangan)</span>
               )}
             </div>
             <p className="font-bold underline text-slate-950">
               {settings.namaPejabat || 'Drs. H. Bambang Wijanarko, M.Pd.'}
             </p>
             {settings.nipPejabat && (
-              <p className="text-[10px] text-slate-600">NIP. {settings.nipPejabat}</p>
+              <p className="text-[10px] text-slate-600 font-sans">NIP. {settings.nipPejabat}</p>
             )}
           </div>
 
+          {/* Pejabat 2: Pengelola Sarana & Prasarana */}
           <div>
             <p className="text-slate-600">
-              Tegalsari, {new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}
+              Banyuwangi, {new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}
             </p>
-            <p className="font-bold text-slate-900 mt-0.5">Pengelola Sarana & Prasarana</p>
+            <p className="font-bold text-slate-900 mt-0.5">
+              {settings.jabatanPengelola || 'Pengelola Sarana & Prasarana'}
+            </p>
             <div className="h-20 flex items-center justify-center">
-              <span className="text-[10px] text-slate-300 italic">(Tanda Tangan)</span>
+              {settings.tandaTanganPengelolaUrl ? (
+                <img src={settings.tandaTanganPengelolaUrl} alt="TTD Pengelola" className="h-16 object-contain" />
+              ) : (
+                <span className="text-[10px] text-slate-300 italic">(Tanda Tangan)</span>
+              )}
             </div>
-            <p className="font-bold underline text-slate-950">Petugas Sarpras SMKN 1 Tegalsari</p>
-            <p className="text-[10px] text-slate-600">NIP. -</p>
+            <p className="font-bold underline text-slate-950">
+              {settings.namaPengelola || 'Moch. Nurul Huda, S.Pd.'}
+            </p>
+            {settings.nipPengelola ? (
+              <p className="text-[10px] text-slate-600 font-sans">NIP. {settings.nipPengelola}</p>
+            ) : (
+              <p className="text-[10px] text-slate-400 font-sans">NIP. -</p>
+            )}
           </div>
         </div>
       </div>

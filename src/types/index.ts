@@ -197,9 +197,14 @@ export interface SchoolSettings {
   email: string;
   website?: string;
   logoUrl?: string;
+  logoProvinsiUrl?: string;
   namaPejabat: string;
   jabatanPejabat: string;
   nipPejabat?: string;
   tandaTanganUrl?: string;
+  namaPengelola?: string;
+  jabatanPengelola?: string;
+  nipPengelola?: string;
+  tandaTanganPengelolaUrl?: string;
   updatedAt?: string;
 }
