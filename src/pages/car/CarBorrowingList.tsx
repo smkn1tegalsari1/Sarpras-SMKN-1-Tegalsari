@@ -14,6 +14,7 @@ import {
   XCircle,
   Flag,
   FileText,
+  RotateCcw,
 } from 'lucide-react';
 
 interface CarBorrowingListProps {
@@ -232,13 +233,15 @@ export const CarBorrowingList: React.FC<CarBorrowingListProps> = ({
                           </>
                         )}
 
-                        {/* Complete action */}
+                        {/* Complete & Return Check action */}
                         {!isPemohon && item.status === 'DISETUJUI' && (
                           <button
                             onClick={() => onUpdateStatus(item, 'SELESAI')}
-                            className="px-2.5 py-1 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-bold text-[11px] transition shadow-2xs"
+                            className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-bold text-[11px] transition shadow-2xs"
+                            title="Pemeriksaan Kondisi & Pengembalian Mobil"
                           >
-                            Selesai
+                            <RotateCcw className="w-3 h-3" />
+                            Cek Pengembalian
                           </button>
                         )}
 

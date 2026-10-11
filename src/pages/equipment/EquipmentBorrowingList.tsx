@@ -13,6 +13,7 @@ import {
   CheckCircle2,
   XCircle,
   Layers,
+  RotateCcw,
 } from 'lucide-react';
 
 interface EquipmentBorrowingListProps {
@@ -269,6 +270,18 @@ export const EquipmentBorrowingList: React.FC<EquipmentBorrowingListProps> = ({
                                 <XCircle className="w-4 h-4" />
                               </button>
                             </>
+                          )}
+
+                          {/* Return Check action for approved active loan */}
+                          {!isPemohon && item.status === 'DISETUJUI' && (
+                            <button
+                              onClick={() => onUpdateStatus(item, 'SELESAI')}
+                              className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-[11px] transition shadow-2xs"
+                              title="Pemeriksaan Fisik Barang & Pengembalian"
+                            >
+                              <RotateCcw className="w-3 h-3" />
+                              Cek Pengembalian
+                            </button>
                           )}
                         </div>
                       </td>

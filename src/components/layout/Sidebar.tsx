@@ -18,6 +18,7 @@ import {
   PlusCircle,
   Clock,
   ShieldAlert,
+  RotateCcw,
 } from 'lucide-react';
 
 interface SidebarProps {
@@ -29,6 +30,7 @@ interface SidebarProps {
   pendingCarCount?: number;
   pendingHallCount?: number;
   pendingEquipmentCount?: number;
+  pendingReturnsCount?: number;
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({
@@ -40,6 +42,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   pendingCarCount = 0,
   pendingHallCount = 0,
   pendingEquipmentCount = 0,
+  pendingReturnsCount = 0,
 }) => {
   const { role, userProfile } = useAuth();
 
@@ -212,6 +215,21 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   <CalendarDays className="w-4 h-4" />
                   Kalender Sarpras
                 </span>
+              </button>
+
+              <button
+                onClick={() => handleSelectTab('returns')}
+                className={navItemClass('returns')}
+              >
+                <span className="flex items-center gap-2.5">
+                  <RotateCcw className="w-4 h-4" />
+                  Pengembalian Sarpras
+                </span>
+                {pendingReturnsCount > 0 && (
+                  <span className="px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-400 text-slate-900">
+                    {pendingReturnsCount}
+                  </span>
+                )}
               </button>
             </div>
           </div>

@@ -14,6 +14,7 @@ import {
   XCircle,
   FileText,
   Users,
+  RotateCcw,
 } from 'lucide-react';
 
 interface HallBookingListProps {
@@ -230,9 +231,11 @@ export const HallBookingList: React.FC<HallBookingListProps> = ({
                         {!isPemohon && item.status === 'DISETUJUI' && (
                           <button
                             onClick={() => onUpdateStatus(item, 'SELESAI')}
-                            className="px-2.5 py-1 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-bold text-[11px] transition shadow-2xs"
+                            className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[11px] transition shadow-2xs"
+                            title="Pemeriksaan Kebersihan, Fasilitas & Pengembalian Aula"
                           >
-                            Selesai
+                            <RotateCcw className="w-3 h-3" />
+                            Cek Pengembalian
                           </button>
                         )}
 

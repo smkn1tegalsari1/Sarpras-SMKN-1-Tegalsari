@@ -107,6 +107,7 @@ export interface CarBorrowing {
   catatan?: string;
   catatanPetugas?: string;
   status: ApplicationStatus;
+  pengembalian?: ReturnInspection;
   createdAt: string;
   updatedAt: string;
 }
@@ -131,6 +132,7 @@ export interface HallBooking {
   keterangan?: string;
   catatanPetugas?: string;
   status: ApplicationStatus;
+  pengembalian?: ReturnInspection;
   createdAt: string;
   updatedAt: string;
 }
@@ -140,6 +142,51 @@ export interface BorrowedEquipmentItem {
   nama: string;
   jumlah: number;
   kondisiSaatPinjam: string;
+}
+
+export interface EquipmentReturnCheckItem {
+  facilityId: string;
+  nama: string;
+  jumlahDipinjam: number;
+  jumlahKembali: number;
+  kondisiAwal: string;
+  kondisiKembali: 'BAIK' | 'RUSAK RINGAN' | 'RUSAK BERAT' | 'HILANG';
+  catatanItem?: string;
+}
+
+export interface ReturnInspection {
+  checkedAt: string;
+  checkedBy: string;
+  checkedByRole: UserRole;
+  checkedByNip?: string;
+  statusKondisi: 'SESUAI' | 'RUSAK' | 'KOTOR' | 'PERLU_PERBAIKAN';
+  catatanPemeriksa: string;
+
+  // Mobil
+  kmAwal?: string | number;
+  kmAkhir?: string | number;
+  jarakTempuh?: number;
+  bbmAwal?: number;
+  bbmAkhir?: number;
+  kebersihanMobil?: 'BERSIH' | 'CUKUP' | 'KOTOR';
+  kondisiFisikMobil?: 'MULUS' | 'LECET' | 'PENYOK' | 'BAIK';
+  kelengkapanMobil?: {
+    stnk: boolean;
+    kunci: boolean;
+    banSerep: boolean;
+    dongkrak: boolean;
+  };
+
+  // Aula
+  kebersihanAula?: 'BERSIH' | 'CUKUP' | 'KOTOR';
+  kondisiFasilitasAula?: 'LENGKAP_BAIK' | 'ADA_KERUSAKAN' | 'KOTOR';
+  catatanFasilitasAula?: string;
+
+  // Peralatan
+  itemsCheck?: EquipmentReturnCheckItem[];
+
+  // Rekomendasi ketersediaan aset
+  statusAsetSetelahKembali: 'TERSEDIA' | 'SERVIS' | 'RENOVASI';
 }
 
 export interface EquipmentBorrowing {
@@ -160,6 +207,7 @@ export interface EquipmentBorrowing {
   keterangan?: string;
   catatanPetugas?: string;
   status: ApplicationStatus;
+  pengembalian?: ReturnInspection;
   createdAt: string;
   updatedAt: string;
 }

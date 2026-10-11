@@ -395,12 +395,20 @@ export const Dashboard: React.FC<DashboardProps> = ({
                 <span>Tidak ada peminjaman yang berlangsung hari ini.</span>
               )}
             </span>
-            <button
-              onClick={() => onNavigate('sarpras_calendar')}
-              className="font-bold text-blue-600 hover:text-blue-800 flex items-center gap-1 hover:underline shrink-0"
-            >
-              Kalender Sarpras <ArrowRight className="w-3.5 h-3.5" />
-            </button>
+            <div className="flex items-center gap-3">
+              <button
+                onClick={() => onNavigate('returns')}
+                className="font-bold text-amber-700 hover:text-amber-900 flex items-center gap-1 hover:underline shrink-0 text-xs"
+              >
+                Pengembalian ({totalActiveBorrowings}) <ArrowRight className="w-3.5 h-3.5" />
+              </button>
+              <button
+                onClick={() => onNavigate('sarpras_calendar')}
+                className="font-bold text-blue-600 hover:text-blue-800 flex items-center gap-1 hover:underline shrink-0 text-xs"
+              >
+                Kalender Sarpras <ArrowRight className="w-3.5 h-3.5" />
+              </button>
+            </div>
           </div>
         </div>
 

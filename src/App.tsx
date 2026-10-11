@@ -17,6 +17,8 @@ import { VehiclesPage } from './pages/inventory/VehiclesPage';
 import { RoomsPage } from './pages/inventory/RoomsPage';
 import { FacilitiesPage } from './pages/inventory/FacilitiesPage';
 import { ReportsPage } from './pages/reports/ReportsPage';
+import { ReturnsPage } from './pages/returns/ReturnsPage';
+import { ReturnCheckModal } from './pages/returns/ReturnCheckModal';
 import { UsersPage } from './pages/admin/UsersPage';
 import { UnitsPage } from './pages/admin/UnitsPage';
 import { SettingsPage } from './pages/admin/SettingsPage';
@@ -38,6 +40,7 @@ import {
   AppNotification,
   SchoolSettings,
   ApplicationStatus,
+  ReturnInspection,
 } from './types';
 import {
   subscribeSettings,
@@ -69,6 +72,7 @@ const ALLOWED_TABS_BY_ROLE: Record<UserRole, string[]> = {
     'equipment_list',
     'equipment_new',
     'sarpras_calendar',
+    'returns',
     'vehicles',
     'rooms',
     'facilities',
@@ -89,6 +93,7 @@ const ALLOWED_TABS_BY_ROLE: Record<UserRole, string[]> = {
     'equipment_list',
     'equipment_new',
     'sarpras_calendar',
+    'returns',
     'vehicles',
     'rooms',
     'facilities',
@@ -106,6 +111,7 @@ const ALLOWED_TABS_BY_ROLE: Record<UserRole, string[]> = {
     'equipment_list',
     'equipment_new',
     'sarpras_calendar',
+    'returns',
   ],
 };
 
@@ -140,6 +146,10 @@ const AppContent: React.FC = () => {
   const [selectedCarDetail, setSelectedCarDetail] = useState<CarBorrowing | null>(null);
   const [selectedHallDetail, setSelectedHallDetail] = useState<HallBooking | null>(null);
   const [selectedEquipmentDetail, setSelectedEquipmentDetail] = useState<EquipmentBorrowing | null>(null);
+  const [selectedReturnCheckItem, setSelectedReturnCheckItem] = useState<{
+    item: any;
+    type: 'MOBIL' | 'AULA' | 'PERALATAN';
+  } | null>(null);
   const [carToPrint, setCarToPrint] = useState<CarBorrowing | null>(null);
   const [hallToPrint, setHallToPrint] = useState<HallBooking | null>(null);
   const [equipmentToPrint, setEquipmentToPrint] = useState<EquipmentBorrowing | null>(null);
@@ -187,6 +197,13 @@ const AppContent: React.FC = () => {
     newStatus: ApplicationStatus,
     note?: string
   ) => {
+    // If attempting to complete, enforce inspection check first
+    if (newStatus === 'SELESAI') {
+      setSelectedCarDetail(null);
+      setSelectedReturnCheckItem({ item, type: 'MOBIL' });
+      return;
+    }
+
     try {
       const ref = doc(db, 'carBorrowings', item.id);
       await updateDoc(ref, {
@@ -200,7 +217,7 @@ const AppContent: React.FC = () => {
         const vRef = doc(db, 'vehicles', item.vehicleId);
         if (newStatus === 'DISETUJUI') {
           await updateDoc(vRef, { status: 'DIGUNAKAN' });
-        } else if (['SELESAI', 'DITOLAK', 'DIBATALKAN'].includes(newStatus)) {
+        } else if (['DITOLAK', 'DIBATALKAN'].includes(newStatus)) {
           await updateDoc(vRef, { status: 'TERSEDIA' });
         }
       }
@@ -247,6 +264,13 @@ const AppContent: React.FC = () => {
     newStatus: ApplicationStatus,
     note?: string
   ) => {
+    // If attempting to complete, enforce inspection check first
+    if (newStatus === 'SELESAI') {
+      setSelectedHallDetail(null);
+      setSelectedReturnCheckItem({ item, type: 'AULA' });
+      return;
+    }
+
     try {
       const ref = doc(db, 'hallBookings', item.id);
       await updateDoc(ref, {
@@ -254,6 +278,18 @@ const AppContent: React.FC = () => {
         catatanPetugas: note || '',
         updatedAt: new Date().toISOString(),
       });
+
+      // Update room status accordingly
+      const aulaRoom = rooms.find(
+        (r) => r.kode === 'R-AULA-01' || r.nama.toLowerCase().includes('aula')
+      );
+      if (aulaRoom) {
+        if (newStatus === 'DISETUJUI') {
+          await updateDoc(doc(db, 'rooms', aulaRoom.id), { status: 'DIGUNAKAN' });
+        } else if (['DITOLAK', 'DIBATALKAN'].includes(newStatus)) {
+          await updateDoc(doc(db, 'rooms', aulaRoom.id), { status: 'TERSEDIA' });
+        }
+      }
 
       await logStatusHistory({
         recordId: item.id,
@@ -294,6 +330,13 @@ const AppContent: React.FC = () => {
     newStatus: ApplicationStatus,
     note?: string
   ) => {
+    // If attempting to complete, enforce inspection check first
+    if (newStatus === 'SELESAI') {
+      setSelectedEquipmentDetail(null);
+      setSelectedReturnCheckItem({ item, type: 'PERALATAN' });
+      return;
+    }
+
     try {
       const ref = doc(db, 'equipmentBorrowings', item.id);
       await updateDoc(ref, {
@@ -320,9 +363,6 @@ const AppContent: React.FC = () => {
       } else if (newStatus === 'DITOLAK') {
         notifTitle = 'Peminjaman Peralatan Ditolak';
         notifMsg = 'Pengajuan peminjaman peralatan Anda ditolak.';
-      } else if (newStatus === 'SELESAI') {
-        notifTitle = 'Peminjaman Peralatan Selesai';
-        notifMsg = 'Pengembalian peralatan telah diverifikasi dan selesai.';
       }
 
       await createNotification({
@@ -335,6 +375,133 @@ const AppContent: React.FC = () => {
       setSelectedEquipmentDetail(null);
     } catch (err) {
       handleFirestoreError(err, OperationType.UPDATE, `equipmentBorrowings/${item.id}`);
+    }
+  };
+
+  // Dedicated Handler: Process Return Inspection & Mark Finished
+  const handleProcessReturn = async (
+    item: any,
+    type: 'MOBIL' | 'AULA' | 'PERALATAN',
+    inspection: ReturnInspection
+  ) => {
+    try {
+      const now = new Date().toISOString();
+
+      if (type === 'MOBIL') {
+        const ref = doc(db, 'carBorrowings', item.id);
+        await updateDoc(ref, {
+          status: 'SELESAI',
+          pengembalian: inspection,
+          catatanPetugas: inspection.catatanPemeriksa || 'Pengembalian mobil selesai diperiksa',
+          updatedAt: now,
+        });
+
+        // Set vehicle availability based on inspection recommendation
+        if (item.vehicleId) {
+          const vRef = doc(db, 'vehicles', item.vehicleId);
+          const newStatus = inspection.statusAsetSetelahKembali === 'SERVIS' ? 'SERVIS' : 'TERSEDIA';
+          await updateDoc(vRef, { status: newStatus, updatedAt: now });
+        }
+
+        await logStatusHistory({
+          recordId: item.id,
+          jenisPengajuan: 'MOBIL',
+          statusLama: item.status,
+          statusBaru: 'SELESAI',
+          userId: userProfile?.uid || 'user',
+          userNama: userProfile?.nama || inspection.checkedBy,
+          catatan: `Pengembalian mobil disetujui setelah pengecekan fisik (Kondisi: ${inspection.statusKondisi}, KM Akhir: ${inspection.kmAkhir || '-'}). Kendaraan kini ${inspection.statusAsetSetelahKembali === 'SERVIS' ? 'masuk jadwal SERVIS' : 'tersedia kembali'}.`,
+        });
+
+        await createNotification({
+          userId: item.userId,
+          title: 'Pengembalian Mobil Disetujui',
+          message: `Peminjaman mobil ${item.nomorPengajuan} telah selesai dicek oleh petugas (${inspection.checkedBy}). Kendaraan telah kembali ke garasi.`,
+          link: 'returns',
+        });
+      } else if (type === 'AULA') {
+        const ref = doc(db, 'hallBookings', item.id);
+        await updateDoc(ref, {
+          status: 'SELESAI',
+          pengembalian: inspection,
+          catatanPetugas: inspection.catatanPemeriksa || 'Penggunaan aula selesai diperiksa',
+          updatedAt: now,
+        });
+
+        // Set room availability
+        const targetRoom = rooms.find(
+          (r) => r.kode === 'R-AULA-01' || r.nama.toLowerCase().includes('aula')
+        );
+        if (targetRoom) {
+          const newStatus = inspection.statusAsetSetelahKembali === 'RENOVASI' ? 'RENOVASI' : 'TERSEDIA';
+          await updateDoc(doc(db, 'rooms', targetRoom.id), { status: newStatus, updatedAt: now });
+        }
+
+        await logStatusHistory({
+          recordId: item.id,
+          jenisPengajuan: 'AULA',
+          statusLama: item.status,
+          statusBaru: 'SELESAI',
+          userId: userProfile?.uid || 'user',
+          userNama: userProfile?.nama || inspection.checkedBy,
+          catatan: `Penggunaan aula disetujui selesai setelah pengecekan kebersihan dan fasilitas (Kondisi: ${inspection.statusKondisi}). Ruangan kini ${inspection.statusAsetSetelahKembali === 'RENOVASI' ? 'dalam masa renovasi' : 'kembali tersedia'}.`,
+        });
+
+        await createNotification({
+          userId: item.userId,
+          title: 'Penggunaan Aula Selesai',
+          message: `Penggunaan aula ${item.nomorPengajuan} telah diverifikasi selesai oleh petugas (${inspection.checkedBy}). Terima kasih.`,
+          link: 'returns',
+        });
+      } else if (type === 'PERALATAN') {
+        const ref = doc(db, 'equipmentBorrowings', item.id);
+        await updateDoc(ref, {
+          status: 'SELESAI',
+          pengembalian: inspection,
+          catatanPetugas: inspection.catatanPemeriksa || 'Peminjaman peralatan selesai diperiksa',
+          updatedAt: now,
+        });
+
+        // Update any facility condition if damaged
+        if (inspection.itemsCheck) {
+          for (const it of inspection.itemsCheck) {
+            if (
+              it.facilityId &&
+              (it.kondisiKembali === 'RUSAK RINGAN' || it.kondisiKembali === 'RUSAK BERAT')
+            ) {
+              try {
+                await updateDoc(doc(db, 'facilities', it.facilityId), {
+                  kondisi: it.kondisiKembali,
+                  updatedAt: now,
+                });
+              } catch (e) {
+                console.error('Failed to update facility condition:', e);
+              }
+            }
+          }
+        }
+
+        await logStatusHistory({
+          recordId: item.id,
+          jenisPengajuan: 'PERALATAN',
+          statusLama: item.status,
+          statusBaru: 'SELESAI',
+          userId: userProfile?.uid || 'user',
+          userNama: userProfile?.nama || inspection.checkedBy,
+          catatan: `Peminjaman peralatan disetujui selesai setelah pengecekan fisik barang kembali (Kondisi: ${inspection.statusKondisi}). Peralatan kini tersedia kembali.`,
+        });
+
+        await createNotification({
+          userId: item.userId,
+          title: 'Peminjaman Peralatan Selesai',
+          message: `Peminjaman peralatan ${item.nomorPengajuan} telah selesai dicek dan dikembalikan ke gudang oleh petugas (${inspection.checkedBy}). Terima kasih.`,
+          link: 'returns',
+        });
+      }
+
+      setSelectedReturnCheckItem(null);
+    } catch (err) {
+      handleFirestoreError(err, OperationType.UPDATE, `${type}/${item?.id}`);
     }
   };
 
@@ -355,6 +522,10 @@ const AppContent: React.FC = () => {
   const pendingCarCount = carBorrowings.filter((c) => c.status === 'MENUNGGU PERSETUJUAN').length;
   const pendingHallCount = hallBookings.filter((h) => h.status === 'MENUNGGU PERSETUJUAN').length;
   const pendingEquipmentCount = equipmentBorrowings.filter((e) => e.status === 'MENUNGGU PERSETUJUAN').length;
+  const pendingReturnsCount =
+    carBorrowings.filter((c) => c.status === 'DISETUJUI').length +
+    hallBookings.filter((h) => h.status === 'DISETUJUI').length +
+    equipmentBorrowings.filter((e) => e.status === 'DISETUJUI').length;
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-800 font-sans antialiased flex">
@@ -368,6 +539,7 @@ const AppContent: React.FC = () => {
         pendingCarCount={pendingCarCount}
         pendingHallCount={pendingHallCount}
         pendingEquipmentCount={pendingEquipmentCount}
+        pendingReturnsCount={pendingReturnsCount}
       />
 
       {/* Main Content Area */}
@@ -472,6 +644,17 @@ const AppContent: React.FC = () => {
               onOpenCarDetail={(item) => setSelectedCarDetail(item)}
               onOpenHallDetail={(item) => setSelectedHallDetail(item)}
               onOpenEquipmentDetail={(item) => setSelectedEquipmentDetail(item)}
+            />
+          )}
+
+          {/* PENGEMBALIAN SARPRAS */}
+          {activeTab === 'returns' && (
+            <ReturnsPage
+              carBorrowings={carBorrowings}
+              hallBookings={hallBookings}
+              equipmentBorrowings={equipmentBorrowings}
+              settings={settings}
+              onProcessReturn={handleProcessReturn}
             />
           )}
 
@@ -645,6 +828,18 @@ const AppContent: React.FC = () => {
           data={equipmentToPrint}
           settings={settings}
           onClose={() => setEquipmentToPrint(null)}
+        />
+      )}
+
+      {/* Return & Inspection Modal */}
+      {selectedReturnCheckItem && (
+        <ReturnCheckModal
+          isOpen={!!selectedReturnCheckItem}
+          onClose={() => setSelectedReturnCheckItem(null)}
+          item={selectedReturnCheckItem.item}
+          itemType={selectedReturnCheckItem.type}
+          settings={settings}
+          onConfirmReturn={handleProcessReturn}
         />
       )}
     </div>

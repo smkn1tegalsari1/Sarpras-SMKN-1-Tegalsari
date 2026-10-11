@@ -17,6 +17,8 @@ import {
   FileText,
   Camera,
   AlertCircle,
+  RotateCcw,
+  FileCheck2,
 } from 'lucide-react';
 
 interface CarDetailModalProps {
@@ -260,6 +262,52 @@ export const CarDetailModal: React.FC<CarDetailModalProps> = ({
         )}
       </div>
 
+      {/* Hasil Berita Acara Pengecekan Pengembalian (Jika Sudah Selesai) */}
+      {data.pengembalian && (
+        <div className="p-4 rounded-2xl bg-emerald-50/70 border border-emerald-200 space-y-3">
+          <div className="flex items-center justify-between">
+            <h4 className="font-extrabold text-emerald-900 text-xs uppercase tracking-wider flex items-center gap-2">
+              <FileCheck2 className="w-4 h-4 text-emerald-600" />
+              Berita Acara Pengecekan Pengembalian
+            </h4>
+            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-200 text-emerald-800">
+              Kondisi: {data.pengembalian.statusKondisi}
+            </span>
+          </div>
+
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs pt-1">
+            <div>
+              <span className="text-slate-400 block text-[11px]">Diperiksa Oleh</span>
+              <span className="font-bold text-slate-800">{data.pengembalian.checkedBy}</span>
+            </div>
+            <div>
+              <span className="text-slate-400 block text-[11px]">Waktu Pemeriksaan</span>
+              <span className="font-bold text-slate-800">
+                {new Date(data.pengembalian.checkedAt).toLocaleDateString('id-ID')}
+              </span>
+            </div>
+            <div>
+              <span className="text-slate-400 block text-[11px]">KM Akhir / Tempuh</span>
+              <span className="font-bold text-slate-800">
+                {data.pengembalian.kmAkhir || '-'} KM
+                {data.pengembalian.jarakTempuh ? ` (+${data.pengembalian.jarakTempuh} KM)` : ''}
+              </span>
+            </div>
+            <div>
+              <span className="text-slate-400 block text-[11px]">Level BBM Kembali</span>
+              <span className="font-bold text-slate-800">{data.pengembalian.bbmAkhir ?? '-'}%</span>
+            </div>
+          </div>
+
+          <div className="pt-2 border-t border-emerald-200/60 text-xs">
+            <span className="text-slate-500 font-semibold block text-[11px]">Catatan Petugas:</span>
+            <p className="font-medium text-slate-800 mt-0.5 italic">
+              "{data.pengembalian.catatanPemeriksa || 'Kondisi kendaraan sesuai.'}"
+            </p>
+          </div>
+        </div>
+      )}
+
       {/* Action Buttons & Status Changer */}
       {!isPemohon && (
         <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-3">
@@ -293,12 +341,12 @@ export const CarDetailModal: React.FC<CarDetailModalProps> = ({
             {data.status === 'DISETUJUI' && (
               <button
                 onClick={() => {
-                  setTargetStatus('SELESAI');
-                  setShowStatusAction(true);
+                  onUpdateStatus(data, 'SELESAI');
                 }}
-                className="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow-xs transition"
+                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow-xs transition"
               >
-                Tandai Peminjaman Selesai
+                <RotateCcw className="w-4 h-4" />
+                Pemeriksaan Fisik & Pengembalian
               </button>
             )}
           </div>

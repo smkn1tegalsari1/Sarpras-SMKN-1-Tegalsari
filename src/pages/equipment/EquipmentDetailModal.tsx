@@ -15,6 +15,8 @@ import {
   FileText,
   Layers,
   CheckCheck,
+  RotateCcw,
+  FileCheck2,
 } from 'lucide-react';
 
 interface EquipmentDetailModalProps {
@@ -219,6 +221,45 @@ export const EquipmentDetailModal: React.FC<EquipmentDetailModalProps> = ({
         </div>
       </div>
 
+      {/* Hasil Berita Acara Pengecekan Pengembalian Peralatan (Jika Sudah Selesai) */}
+      {data.pengembalian && (
+        <div className="p-4 rounded-2xl bg-indigo-50/70 border border-indigo-200 space-y-3">
+          <div className="flex items-center justify-between">
+            <h4 className="font-extrabold text-indigo-900 text-xs uppercase tracking-wider flex items-center gap-2">
+              <FileCheck2 className="w-4 h-4 text-indigo-600" />
+              Berita Acara Pengembalian Peralatan
+            </h4>
+            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-indigo-200 text-indigo-800">
+              Kondisi: {data.pengembalian.statusKondisi}
+            </span>
+          </div>
+
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 text-xs pt-1">
+            <div>
+              <span className="text-slate-400 block text-[11px]">Diperiksa Oleh</span>
+              <span className="font-bold text-slate-800">{data.pengembalian.checkedBy}</span>
+            </div>
+            <div>
+              <span className="text-slate-400 block text-[11px]">Waktu Pengembalian</span>
+              <span className="font-bold text-slate-800">
+                {new Date(data.pengembalian.checkedAt).toLocaleDateString('id-ID')}
+              </span>
+            </div>
+            <div>
+              <span className="text-slate-400 block text-[11px]">Status Ketersediaan</span>
+              <span className="font-bold text-emerald-700">Tersedia di Gudang</span>
+            </div>
+          </div>
+
+          <div className="pt-2 border-t border-indigo-200/60 text-xs">
+            <span className="text-slate-500 font-semibold block text-[11px]">Catatan Pemeriksa:</span>
+            <p className="font-medium text-slate-800 mt-0.5 italic">
+              "{data.pengembalian.catatanPemeriksa || 'Semua barang kembali lengkap.'}"
+            </p>
+          </div>
+        </div>
+      )}
+
       {/* Action Decision Box (Approval / Rejection / Return Completion) */}
       {!isPemohon && (data.status === 'MENUNGGU PERSETUJUAN' || data.status === 'DISETUJUI') && (
         <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-3">
@@ -251,12 +292,11 @@ export const EquipmentDetailModal: React.FC<EquipmentDetailModalProps> = ({
             <div>
               <button
                 onClick={() => {
-                  setTargetStatus('SELESAI');
-                  setShowStatusAction(true);
+                  onUpdateStatus(data, 'SELESAI');
                 }}
-                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs transition"
+                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs transition shadow-2xs"
               >
-                <CheckCheck className="w-4 h-4" /> Verifikasi Pengembalian Selesai (Barang Kembali)
+                <RotateCcw className="w-4 h-4" /> Pemeriksaan Fisik Barang & Pengembalian
               </button>
             </div>
           )}
