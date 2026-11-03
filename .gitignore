@@ -11,6 +11,12 @@ node_modules
 dist
 dist-ssr
 *.local
+.env
+.env.*
+!.env.example
+bun.lock
+bun.lockb
+.dev.pid
 
 # Editor directories and files
 .vscode/*
