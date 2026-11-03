@@ -281,7 +281,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
             Selamat Datang, {userProfile?.nama}!
           </h1>
           <p className="mt-2 text-sm text-blue-100 leading-relaxed">
-            Sistem Informasi Sarana dan Prasarana (SISARPRAS) SMK Negeri 1 Tegalsari.
+            SISTEM INFORMASI SARPRAS SMK Negeri 1 Tegalsari.
             Kelola pengajuan peminjaman kendaraan operasional, pemakaian aula, dan inventaris sekolah secara transparan & terkoordinasi.
           </p>
 

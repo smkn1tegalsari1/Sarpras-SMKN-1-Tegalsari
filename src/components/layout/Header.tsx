@@ -64,15 +64,15 @@ export const Header: React.FC<HeaderProps> = ({
             )}
             <div>
               <div className="flex items-center gap-2">
-                <span className="font-extrabold text-slate-900 text-base tracking-tight leading-none">
-                  SISARPRAS
+                <span className="font-extrabold text-slate-900 text-xs sm:text-sm md:text-base tracking-tight leading-none uppercase">
+                  SISTEM INFORMASI SARPRAS
                 </span>
-                <span className="hidden sm:inline-block text-[11px] font-bold px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 border border-slate-200">
+                <span className="hidden sm:inline-block text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 border border-slate-200">
                   SMKN 1 TEGALSARI
                 </span>
               </div>
               <p className="text-[10px] text-slate-500 font-medium leading-none mt-1">
-                Sistem Informasi Sarana dan Prasarana
+                SMK Negeri 1 Tegalsari - Banyuwangi
               </p>
             </div>
           </div>

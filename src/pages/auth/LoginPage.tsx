@@ -61,14 +61,14 @@ export const LoginPage: React.FC<LoginPageProps> = ({ settings, onSuccess }) => 
             <p className="text-[11px] font-bold uppercase tracking-widest text-blue-200">
               {settings.instansi || 'PEMERINTAH PROVINSI JAWA TIMUR'}
             </p>
-            <h1 className="text-xl font-black tracking-tight mt-1">
-              SISARPRAS
+            <h1 className="text-xl sm:text-2xl font-black tracking-tight mt-1 uppercase">
+              SISTEM INFORMASI SARPRAS
             </h1>
-            <p className="text-xs font-semibold text-blue-100">
+            <p className="text-xs font-semibold text-blue-100 mt-0.5">
               SMK NEGERI 1 TEGALSARI
             </p>
             <p className="text-[10px] text-blue-200/80 mt-1">
-              Sistem Informasi Sarana dan Prasarana
+              Pengelolaan Sarana & Prasarana Sekolah
             </p>
           </div>
 
