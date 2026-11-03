@@ -39,7 +39,7 @@ export const DEFAULT_SETTINGS: SchoolSettings = {
   telepon: '(0333) 845999',
   email: 'smkn1tegalsari@yahoo.co.id',
   website: 'smkn1tegalsari.sch.id',
-  logoUrl: '',
+  logoUrl: '/assets/aistudio/Logo_SMK_Negeri_1_Tegalsari_200x200_ce1ff52b.jpg',
   logoProvinsiUrl: '',
   namaPejabat: 'Drs. H. Bambang Wijanarko, M.Pd.',
   jabatanPejabat: 'Kepala SMK Negeri 1 Tegalsari',
@@ -64,6 +64,14 @@ export async function seedInitialDataIfNeeded() {
         ...DEFAULT_SETTINGS,
         updatedAt: new Date().toISOString(),
       });
+    } else {
+      const current = settingSnap.data();
+      if (!current.logoUrl) {
+        await updateDoc(settingRef, {
+          logoUrl: '/assets/aistudio/Logo_SMK_Negeri_1_Tegalsari_200x200_ce1ff52b.jpg',
+          updatedAt: new Date().toISOString(),
+        });
+      }
     }
 
     // 2. Units
@@ -573,7 +581,12 @@ export function subscribeSettings(callback: (settings: SchoolSettings) => void) 
     docRef,
     (snap) => {
       if (snap.exists()) {
-        callback(snap.data() as SchoolSettings);
+        const data = snap.data() as SchoolSettings;
+        callback({
+          ...DEFAULT_SETTINGS,
+          ...data,
+          logoUrl: data.logoUrl || DEFAULT_SETTINGS.logoUrl,
+        });
       } else {
         callback(DEFAULT_SETTINGS);
       }

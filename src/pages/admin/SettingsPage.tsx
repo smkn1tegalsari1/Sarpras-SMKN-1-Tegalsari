@@ -307,15 +307,25 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ settings, onUpdated 
                   </div>
 
                   <div className="space-y-2 flex-1">
-                    <label className="cursor-pointer inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs transition shadow-2xs">
-                      <Upload className="w-3.5 h-3.5" /> Unggah Logo Sekolah
-                      <input
-                        type="file"
-                        accept="image/*"
-                        className="hidden"
-                        onChange={(e) => handleImageUpload(e, setLogoUrl)}
-                      />
-                    </label>
+                    <div className="flex flex-wrap items-center gap-2">
+                      <label className="cursor-pointer inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs transition shadow-2xs">
+                        <Upload className="w-3.5 h-3.5" /> Unggah Logo Baru
+                        <input
+                          type="file"
+                          accept="image/*"
+                          className="hidden"
+                          onChange={(e) => handleImageUpload(e, setLogoUrl)}
+                        />
+                      </label>
+
+                      <button
+                        type="button"
+                        onClick={() => setLogoUrl('/assets/aistudio/Logo_SMK_Negeri_1_Tegalsari_200x200_ce1ff52b.jpg')}
+                        className="inline-flex items-center gap-1 px-3 py-2 rounded-xl bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-200 text-xs font-semibold transition"
+                      >
+                        Gunakan Logo Resmi
+                      </button>
+                    </div>
 
                     {logoUrl && (
                       <button
@@ -323,7 +333,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ settings, onUpdated 
                         onClick={() => setLogoUrl('')}
                         className="block text-[11px] font-semibold text-rose-600 hover:underline"
                       >
-                        Hapus Logo Sekolah
+                        Kosongkan Logo Sekolah
                       </button>
                     )}
                   </div>

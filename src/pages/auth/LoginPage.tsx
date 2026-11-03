@@ -50,11 +50,11 @@ export const LoginPage: React.FC<LoginPageProps> = ({ settings, onSuccess }) => 
         <div className="bg-white rounded-3xl shadow-2xl overflow-hidden border border-slate-100">
           {/* Header Banner */}
           <div className="bg-linear-to-r from-blue-700 to-indigo-800 p-8 text-white text-center relative">
-            <div className="w-16 h-16 rounded-2xl bg-white/10 backdrop-blur-md flex items-center justify-center mx-auto mb-4 border border-white/20 shadow-inner">
+            <div className="w-16 h-16 rounded-2xl bg-white p-1.5 shadow-md flex items-center justify-center mx-auto mb-4 border border-white/40">
               {settings.logoUrl ? (
-                <img src={settings.logoUrl} alt="Logo" className="w-12 h-12 object-contain" />
+                <img src={settings.logoUrl} alt="Logo SMKN 1 Tegalsari" className="w-full h-full object-contain" />
               ) : (
-                <Building2 className="w-8 h-8 text-white" />
+                <Building2 className="w-8 h-8 text-blue-700" />
               )}
             </div>
 
