@@ -438,7 +438,10 @@ export const Dashboard: React.FC<DashboardProps> = ({
               <span className="text-3xl font-black text-slate-900 tracking-tight">
                 {totalMasterAssets}
               </span>
-              <p className="text-[11px] font-bold text-emerald-600">{totalFacilityUnits} Unit Fisik Terdata</p>
+              <p className="text-[11px] font-bold text-slate-500">Jenis Aset Terdaftar</p>
+              <p className="text-[10px] font-semibold text-emerald-600 mt-0.5">
+                Total {totalVehiclesCount + totalRoomsCount + totalFacilityUnits} Unit Fisik
+              </p>
             </div>
           </div>
 
@@ -450,9 +453,9 @@ export const Dashboard: React.FC<DashboardProps> = ({
             >
               <div className="flex items-center justify-between text-slate-700 mb-1">
                 <Car className="w-4 h-4 text-blue-600" />
-                <span className="text-xs font-black text-slate-900">{totalVehiclesCount} Armada</span>
+                <span className="text-xs font-black text-slate-900">{totalVehiclesCount} Mobil</span>
               </div>
-              <p className="text-[11px] font-bold text-slate-800">Mobil Dinas</p>
+              <p className="text-[11px] font-bold text-slate-800">Armada Mobil</p>
               <p className="text-[10px] text-emerald-600 font-semibold">{availableVehiclesCount} Siap Pakai</p>
             </div>
 
@@ -462,7 +465,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
             >
               <div className="flex items-center justify-between text-slate-700 mb-1">
                 <Landmark className="w-4 h-4 text-emerald-600" />
-                <span className="text-xs font-black text-slate-900">{totalRoomsCount} Ruangan</span>
+                <span className="text-xs font-black text-slate-900">{totalRoomsCount} Ruang</span>
               </div>
               <p className="text-[11px] font-bold text-slate-800">Aula & Gedung</p>
               <p className="text-[10px] text-emerald-600 font-semibold">{availableRoomsCount} Tersedia</p>
@@ -474,10 +477,10 @@ export const Dashboard: React.FC<DashboardProps> = ({
             >
               <div className="flex items-center justify-between text-slate-700 mb-1">
                 <Wrench className="w-4 h-4 text-indigo-600" />
-                <span className="text-xs font-black text-slate-900">{totalFacilitiesCount} Kategori</span>
+                <span className="text-xs font-black text-slate-900">{totalFacilitiesCount} Macam</span>
               </div>
-              <p className="text-[11px] font-bold text-slate-800">Perlengkapan</p>
-              <p className="text-[10px] text-indigo-600 font-semibold">{totalFacilityUnits} Unit Barang</p>
+              <p className="text-[11px] font-bold text-slate-800">Alat & Sarana</p>
+              <p className="text-[10px] text-indigo-600 font-semibold">{totalFacilityUnits} Unit Total</p>
             </div>
           </div>
 

@@ -79,9 +79,22 @@ export const LoginPage: React.FC<LoginPageProps> = ({ settings, onSuccess }) => 
             </h2>
 
             {errorMsg && (
-              <div className="mb-5 p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs flex items-center gap-2">
-                <AlertCircle className="w-4 h-4 shrink-0" />
-                <span>{errorMsg}</span>
+              <div className="mb-5 p-3.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-xs space-y-2">
+                <div className="flex items-start gap-2">
+                  <AlertCircle className="w-4 h-4 shrink-0 mt-0.5 text-rose-600" />
+                  <div>
+                    <p className="font-bold">
+                      {errorMsg.includes('unauthorized-domain')
+                        ? 'Domain Belum Terdaftar di Firebase Authorized Domains'
+                        : errorMsg}
+                    </p>
+                    {errorMsg.includes('unauthorized-domain') && (
+                      <p className="text-[11px] text-rose-700 mt-1 leading-relaxed">
+                        Tambahkan domain <code className="bg-white/80 px-1 py-0.5 rounded font-mono font-bold text-blue-700">{typeof window !== 'undefined' ? window.location.hostname : 'domain-anda'}</code> ke Firebase Console &gt; Authentication &gt; Settings &gt; Authorized domains.
+                      </p>
+                    )}
+                  </div>
+                </div>
               </div>
             )}
 

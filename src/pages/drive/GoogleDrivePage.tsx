@@ -275,14 +275,60 @@ export const GoogleDrivePage: React.FC = () => {
       )}
 
       {errorMsg && (
-        <div className="p-3.5 rounded-2xl bg-rose-50 border border-rose-200 text-rose-800 text-xs font-semibold flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <AlertTriangle className="w-4 h-4 text-rose-600 shrink-0" />
-            <span>{errorMsg}</span>
+        <div className="p-4 rounded-2xl bg-rose-50 border border-rose-200 text-rose-900 text-xs space-y-2">
+          <div className="flex items-start justify-between gap-2">
+            <div className="flex items-start gap-2.5">
+              <AlertTriangle className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
+              <div>
+                <p className="font-extrabold text-rose-800">
+                  {errorMsg.includes('unauthorized-domain')
+                    ? 'Domain Aplikasi Belum Terdaftar di Authorized Domains Firebase'
+                    : 'Terjadi Kendala Koneksi Google Drive'}
+                </p>
+                <p className="text-rose-700/90 mt-0.5">{errorMsg}</p>
+              </div>
+            </div>
+            <button
+              onClick={() => setErrorMsg(null)}
+              className="text-rose-500 hover:text-rose-800 font-bold p-1"
+            >
+              ✕
+            </button>
           </div>
-          <button onClick={() => setErrorMsg(null)} className="text-rose-700 hover:text-rose-900">
-            ✕
-          </button>
+
+          {errorMsg.includes('unauthorized-domain') && (
+            <div className="mt-3 p-3.5 rounded-xl bg-white/90 border border-rose-200 text-slate-800 space-y-2.5">
+              <div className="font-bold text-slate-900 flex items-center gap-1.5">
+                <span>Solusi Cepat (Firebase Console):</span>
+              </div>
+              <ol className="list-decimal list-inside space-y-1 text-[11px] text-slate-600 pl-1 leading-relaxed">
+                <li>Buka <strong>Firebase Console</strong> → Proyek <code className="bg-slate-100 px-1 rounded text-blue-700">gen-lang-client-0218701263</code>.</li>
+                <li>Pilih menu <strong>Authentication</strong> → tab <strong>Settings</strong> → <strong>Authorized domains</strong>.</li>
+                <li>Klik <strong>Add domain</strong> lalu masukkan domain aplikasi Anda:</li>
+              </ol>
+
+              <div className="flex flex-wrap items-center gap-2 pt-1">
+                <code className="bg-slate-100 border border-slate-300 px-2.5 py-1.5 rounded-lg text-xs font-mono font-bold text-blue-800 select-all">
+                  {typeof window !== 'undefined' ? window.location.hostname : 'domain-anda.vercel.app'}
+                </code>
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (typeof window !== 'undefined') {
+                      navigator.clipboard.writeText(window.location.hostname);
+                      setSuccessMsg(`Domain "${window.location.hostname}" berhasil disalin.`);
+                    }
+                  }}
+                  className="px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-[11px] font-bold shadow-2xs transition cursor-pointer"
+                >
+                  Salin Domain
+                </button>
+              </div>
+              <p className="text-[10px] text-slate-500 italic">
+                *Catatan: Domain Vercel (seperti <code className="font-mono">*.vercel.app</code>) dan domain preview AI Studio perlu didaftarkan di Authorized Domains Firebase agar login Google dapat memvalidasi origin popup.
+              </p>
+            </div>
+          )}
         </div>
       )}
 
