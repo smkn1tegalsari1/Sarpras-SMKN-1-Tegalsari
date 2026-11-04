@@ -19,6 +19,7 @@ import { FacilitiesPage } from './pages/inventory/FacilitiesPage';
 import { ReportsPage } from './pages/reports/ReportsPage';
 import { ReturnsPage } from './pages/returns/ReturnsPage';
 import { ReturnCheckModal } from './pages/returns/ReturnCheckModal';
+import { GoogleDrivePage } from './pages/drive/GoogleDrivePage';
 import { UsersPage } from './pages/admin/UsersPage';
 import { UnitsPage } from './pages/admin/UnitsPage';
 import { SettingsPage } from './pages/admin/SettingsPage';
@@ -73,6 +74,7 @@ const ALLOWED_TABS_BY_ROLE: Record<UserRole, string[]> = {
     'equipment_new',
     'sarpras_calendar',
     'returns',
+    'google_drive',
     'vehicles',
     'rooms',
     'facilities',
@@ -94,6 +96,7 @@ const ALLOWED_TABS_BY_ROLE: Record<UserRole, string[]> = {
     'equipment_new',
     'sarpras_calendar',
     'returns',
+    'google_drive',
     'vehicles',
     'rooms',
     'facilities',
@@ -112,6 +115,7 @@ const ALLOWED_TABS_BY_ROLE: Record<UserRole, string[]> = {
     'equipment_new',
     'sarpras_calendar',
     'returns',
+    'google_drive',
   ],
 };
 
@@ -657,6 +661,9 @@ const AppContent: React.FC = () => {
               onProcessReturn={handleProcessReturn}
             />
           )}
+
+          {/* GOOGLE DRIVE SARPRAS */}
+          {activeTab === 'google_drive' && <GoogleDrivePage />}
 
           {/* SARANA & PRASARANA (Hanya Admin & Sarpras) */}
           {(role === 'admin' || role === 'sarpras') && (

@@ -12,14 +12,17 @@ import { doc, getDoc, setDoc, getDocs, collection } from 'firebase/firestore';
 import { auth, db, handleFirestoreError, OperationType } from '../lib/firebase';
 import { UserProfile, UserRole } from '../types';
 import { seedInitialDataIfNeeded } from '../services/db';
+import { DRIVE_SCOPES, setCachedDriveToken } from '../services/drive';
 
 interface AuthContextType {
   currentUser: User | null;
   userProfile: UserProfile | null;
   role: UserRole;
   loading: boolean;
+  driveToken: string | null;
   loginWithUsername: (username: string, pass: string) => Promise<void>;
-  loginWithGoogle: () => Promise<void>;
+  loginWithGoogle: () => Promise<string | null>;
+  connectGoogleDrive: () => Promise<string | null>;
   loginWithEmail: (email: string, pass: string) => Promise<void>;
   registerWithEmail: (email: string, pass: string, nama: string, role?: UserRole) => Promise<void>;
   logout: () => Promise<void>;
@@ -81,6 +84,7 @@ const DEMO_PROFILES: Record<UserRole, UserProfile> = {
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
+  const [driveToken, setDriveToken] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
 
   // Initialize DB seeds on mount
@@ -207,17 +211,39 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  const loginWithGoogle = async () => {
+  const loginWithGoogle = async (): Promise<string | null> => {
     setLoading(true);
     try {
       const provider = new GoogleAuthProvider();
-      await signInWithPopup(auth, provider);
+      // Add Google Drive scopes configured via set_up_oauth
+      DRIVE_SCOPES.forEach((scope) => provider.addScope(scope));
+      const result = await signInWithPopup(auth, provider);
+      const credential = GoogleAuthProvider.credentialFromResult(result);
+      const token = credential?.accessToken || null;
+      if (token) {
+        setDriveToken(token);
+        setCachedDriveToken(token);
+      }
+      return token;
     } catch (err) {
       console.error('Google login error:', err);
       throw err;
     } finally {
       setLoading(false);
     }
+  };
+
+  const connectGoogleDrive = async (): Promise<string | null> => {
+    const provider = new GoogleAuthProvider();
+    DRIVE_SCOPES.forEach((scope) => provider.addScope(scope));
+    const result = await signInWithPopup(auth, provider);
+    const credential = GoogleAuthProvider.credentialFromResult(result);
+    const token = credential?.accessToken || null;
+    if (token) {
+      setDriveToken(token);
+      setCachedDriveToken(token);
+    }
+    return token;
   };
 
   const loginWithEmail = async (email: string, pass: string) => {
@@ -296,6 +322,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
     setCurrentUser(null);
     setUserProfile(null);
+    setDriveToken(null);
+    setCachedDriveToken(null);
     localStorage.removeItem('sisarpras_user_session');
     localStorage.removeItem('sisarpras_demo_role');
   };
@@ -331,8 +359,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         userProfile,
         role: currentRole,
         loading,
+        driveToken,
         loginWithUsername,
         loginWithGoogle,
+        connectGoogleDrive,
         loginWithEmail,
         registerWithEmail,
         logout,

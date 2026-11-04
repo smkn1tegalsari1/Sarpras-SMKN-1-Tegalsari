@@ -19,6 +19,7 @@ import {
   Clock,
   ShieldAlert,
   RotateCcw,
+  HardDrive,
 } from 'lucide-react';
 
 interface SidebarProps {
@@ -230,6 +231,16 @@ export const Sidebar: React.FC<SidebarProps> = ({
                     {pendingReturnsCount}
                   </span>
                 )}
+              </button>
+
+              <button
+                onClick={() => handleSelectTab('google_drive')}
+                className={navItemClass('google_drive')}
+              >
+                <span className="flex items-center gap-2.5">
+                  <HardDrive className="w-4 h-4 text-sky-500" />
+                  Google Drive Sarpras
+                </span>
               </button>
             </div>
           </div>
