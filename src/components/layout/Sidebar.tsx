@@ -80,18 +80,14 @@ export const Sidebar: React.FC<SidebarProps> = ({
         {/* Brand / Logo Top */}
         <div className="p-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
           <div className="flex items-center gap-3">
-            {settings.logoUrl ? (
-              <img
-                src={settings.logoUrl}
-                alt="Logo SMKN 1 Tegalsari"
-                className="w-10 h-10 object-contain rounded-lg bg-white p-0.5 border border-slate-200 shadow-2xs"
-              />
-            ) : (
-              <div className="w-10 h-10 rounded-xl bg-blue-700 flex flex-col items-center justify-center text-white shadow-xs font-bold text-xs">
-                <span>SMK</span>
-                <span className="text-[9px] -mt-1 text-blue-200">TEGAL</span>
-              </div>
-            )}
+            <img
+              src={settings.logoUrl || '/assets/aistudio/Logo_SMK_Negeri_1_Tegalsari_200x200_ce1ff52b.jpg'}
+              alt="Logo SMKN 1 Tegalsari"
+              className="w-10 h-10 object-contain rounded-lg bg-white p-0.5 border border-slate-200 shadow-2xs"
+              onError={(e) => {
+                (e.currentTarget as HTMLImageElement).src = '/assets/aistudio/Logo_SMK_Negeri_1_Tegalsari_200x200_ce1ff52b.jpg';
+              }}
+            />
             <div>
               <h1 className="text-xs font-extrabold text-slate-900 leading-tight">
                 SMK NEGERI 1 TEGALSARI

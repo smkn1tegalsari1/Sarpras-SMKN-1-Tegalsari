@@ -51,23 +51,23 @@ export const LoginPage: React.FC<LoginPageProps> = ({ settings, onSuccess }) => 
           {/* Header Banner */}
           <div className="bg-linear-to-r from-blue-700 to-indigo-800 p-8 text-white text-center relative">
             <div className="w-16 h-16 rounded-2xl bg-white p-1.5 shadow-md flex items-center justify-center mx-auto mb-4 border border-white/40">
-              {settings.logoUrl ? (
-                <img src={settings.logoUrl} alt="Logo SMKN 1 Tegalsari" className="w-full h-full object-contain" />
-              ) : (
-                <Building2 className="w-8 h-8 text-blue-700" />
-              )}
+              <img
+                src={settings.logoUrl || '/assets/aistudio/Logo_SMK_Negeri_1_Tegalsari_200x200_ce1ff52b.jpg'}
+                alt="Logo SMKN 1 Tegalsari"
+                className="w-full h-full object-contain"
+                onError={(e) => {
+                  (e.currentTarget as HTMLImageElement).src = '/assets/aistudio/Logo_SMK_Negeri_1_Tegalsari_200x200_ce1ff52b.jpg';
+                }}
+              />
             </div>
 
             <p className="text-[11px] font-bold uppercase tracking-widest text-blue-200">
               {settings.instansi || 'PEMERINTAH PROVINSI JAWA TIMUR'}
             </p>
-            <h1 className="text-xl sm:text-2xl font-black tracking-tight mt-1 uppercase">
-              SISTEM INFORMASI SARPRAS
+            <h1 className="text-lg sm:text-xl font-black tracking-tight mt-1 leading-snug">
+              Sistem Informasi Sarpras SMKN 1 Tegalsari
             </h1>
-            <p className="text-xs font-semibold text-blue-100 mt-0.5">
-              SMK NEGERI 1 TEGALSARI
-            </p>
-            <p className="text-[10px] text-blue-200/80 mt-1">
+            <p className="text-[11px] text-blue-100 font-medium mt-1">
               Pengelolaan Sarana & Prasarana Sekolah
             </p>
           </div>

@@ -51,17 +51,14 @@ export const Header: React.FC<HeaderProps> = ({
           </button>
 
           <div className="flex items-center gap-2.5">
-            {settings.logoUrl ? (
-              <img
-                src={settings.logoUrl}
-                alt="Logo SMKN 1 Tegalsari"
-                className="w-9 h-9 object-contain rounded-lg border border-slate-200 bg-white p-0.5 shadow-2xs"
-              />
-            ) : (
-              <div className="w-9 h-9 rounded-xl bg-blue-600 flex items-center justify-center text-white shadow-xs">
-                <Building2 className="w-5 h-5" />
-              </div>
-            )}
+            <img
+              src={settings.logoUrl || '/assets/aistudio/Logo_SMK_Negeri_1_Tegalsari_200x200_ce1ff52b.jpg'}
+              alt="Logo SMKN 1 Tegalsari"
+              className="w-9 h-9 object-contain rounded-lg border border-slate-200 bg-white p-0.5 shadow-2xs"
+              onError={(e) => {
+                (e.currentTarget as HTMLImageElement).src = '/assets/aistudio/Logo_SMK_Negeri_1_Tegalsari_200x200_ce1ff52b.jpg';
+              }}
+            />
             <div>
               <div className="flex items-center gap-2">
                 <span className="font-extrabold text-slate-900 text-xs sm:text-sm md:text-base tracking-tight leading-none uppercase">
